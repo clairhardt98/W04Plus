@@ -139,23 +139,7 @@ void UText::SetText(FWString _text)
     CreateTextTextureVertexBuffer(vertexTextureArr, byteWidth);
 }
 
-void UText::TextMVPRendering()
-{
-    FEngineLoop::renderer.PrepareTextureShader();
-    FEngineLoop::renderer.UpdateSubUVConstant(0, 0);
-    FMatrix Model = bBillboardMode ? CreateBillboardMatrix() : CreateStandardModelMatrix();
-    FMatrix View = GetEngine().GetLevelEditor()->GetActiveViewportClient()->GetViewMatrix();
-    FMatrix Proj = GetEngine().GetLevelEditor()->GetActiveViewportClient()->GetProjectionMatrix();
 
-    FMatrix MVP = Model * View * Proj;
-    FMatrix NormalMatrix = FMatrix::Transpose(FMatrix::Inverse(Model));
-
-    FVector4 UUIDColor = EncodeUUID() / 255.0f;
-    bool bSelected = (GetWorld()->GetSelectedActor() == GetOwner());
-
-    FEngineLoop::renderer.UpdateConstant(MVP, NormalMatrix, UUIDColor, bSelected);
-    FEngineLoop::renderer.RenderTextPrimitive(vertexTextBuffer, numTextVertices, Texture->TextureSRV, Texture->SamplerState);
-}
 
 FMatrix UText::CreateBillboardMatrix()
 {
