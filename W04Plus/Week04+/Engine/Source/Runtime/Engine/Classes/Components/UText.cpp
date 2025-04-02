@@ -5,6 +5,8 @@
 #include "UnrealEd/EditorViewportClient.h"
 #include "LevelEditor/SLevelEditor.h"
 
+REGISTER_CLASS(UText, UBillboardComponent)
+
 UText::UText()
 {
     SetType(StaticClass()->GetName());

@@ -7,6 +7,8 @@
 #include "World.h"
 #include "Engine/FLoaderOBJ.h"
 
+REGISTER_CLASS(UTransformGizmo, AActor)
+
 UTransformGizmo::UTransformGizmo()
 {
     FManagerOBJ::CreateStaticMesh("Assets/gizmo_loc_x.obj");

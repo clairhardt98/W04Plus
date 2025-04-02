@@ -4,6 +4,7 @@
 #include "World.h"
 #include "LevelEditor/SLevelEditor.h"
 
+REGISTER_CLASS(UParticleSubUVComp, UBillboardComponent)
 
 UParticleSubUVComp::UParticleSubUVComp()
 {

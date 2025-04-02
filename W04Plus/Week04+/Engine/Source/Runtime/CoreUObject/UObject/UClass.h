@@ -1,6 +1,7 @@
 #pragma once
 #include <concepts>
 #include "Object.h"
+#include "Core/Container/Array.h"
 
 /**
  * UObject의 RTTI를 가지고 있는 클래스
@@ -47,6 +48,28 @@ public:
             const_cast<UClass*>(this)->CreateDefaultObject();
         }
         return ClassDefaultObject;
+    }
+
+    static TMap<FString, UClass*>& GetRegistry()
+    {
+        static TMap<FString, UClass*> Registry;
+        return Registry;
+    }
+
+    static UClass* FindClass(const FString& ClassName)
+    {
+        auto& Registry = GetRegistry();
+        auto Found = Registry.Find(ClassName);
+        if (Found == nullptr)
+        {
+            return nullptr;
+        }
+        return *Found;
+    }
+
+    static void RegisterClass(UClass* Class)
+    {
+        GetRegistry()[Class->GetName()] = Class;
     }
 
 protected:

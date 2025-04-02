@@ -49,6 +49,7 @@ private:
     TArray<AActor*> PendingBeginPlayActors;
 
     AActor* SelectedActor = nullptr;
+    USceneComponent* SelectedComponent = nullptr;
 
     USceneComponent* pickingGizmo = nullptr;
     UCameraComponent* camera = nullptr;
@@ -69,8 +70,14 @@ public:
     void SetPickedActor(AActor* InActor)
     {
         SelectedActor = InActor;
+        SelectedComponent = nullptr;
     }
 
+    USceneComponent* GetSelectedComponent() const { return SelectedComponent; }
+    void SetPickedComponent(USceneComponent* InComponent) 
+    {
+        SelectedComponent = InComponent;
+    }
     UObject* GetWorldGizmo() const { return worldGizmo; }
     USceneComponent* GetPickingGizmo() const { return pickingGizmo; }
     void SetPickingGizmo(UObject* Object);

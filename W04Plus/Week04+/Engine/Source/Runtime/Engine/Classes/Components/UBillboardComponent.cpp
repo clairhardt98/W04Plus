@@ -10,7 +10,7 @@
 #include "LevelEditor/SLevelEditor.h"
 #include "PropertyEditor/ShowFlags.h"
 
-
+REGISTER_CLASS(UBillboardComponent, UPrimitiveComponent)
 UBillboardComponent::UBillboardComponent()
 {
     SetType(StaticClass()->GetName());

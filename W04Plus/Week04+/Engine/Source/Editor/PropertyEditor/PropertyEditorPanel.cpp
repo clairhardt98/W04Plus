@@ -40,16 +40,19 @@ void PropertyEditorPanel::Render()
     
     AEditorPlayer* player = GEngineLoop.GetWorld()->GetEditorPlayer();
     AActor* PickedActor = GEngineLoop.GetWorld()->GetSelectedActor();
-    if (PickedActor)
+    USceneComponent* PickedComponent = GEngineLoop.GetWorld()->GetSelectedComponent();
+
+    USceneComponent* CurrentComponent = PickedComponent ? PickedComponent : PickedActor ? PickedActor->GetRootComponent() : nullptr;
+    if (CurrentComponent)
     {
         ImGui::SetItemDefaultFocus();
         // TreeNode 배경색을 변경 (기본 상태)
         ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
         if (ImGui::TreeNodeEx("Transform", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) // 트리 노드 생성
         {
-            Location = PickedActor->GetActorLocation();
-            Rotation = PickedActor->GetActorRotation();
-            Scale = PickedActor->GetActorScale();
+            Location = CurrentComponent->GetLocalLocation();
+            Rotation = CurrentComponent->GetLocalRotation();
+            Scale = CurrentComponent->GetLocalScale();
             
             FImGuiWidget::DrawVec3Control("Location", Location, 0, 85);
             ImGui::Spacing();
@@ -60,9 +63,9 @@ void PropertyEditorPanel::Render()
             FImGuiWidget::DrawVec3Control("Scale", Scale, 0, 85);
             ImGui::Spacing();
 
-            PickedActor->SetActorLocation(Location);
-            PickedActor->SetActorRotation(Rotation);
-            PickedActor->SetActorScale(Scale);
+            CurrentComponent->SetLocation(Location);
+            CurrentComponent->SetRotation(Rotation);
+            CurrentComponent->SetScale(Scale);
             
             std::string coordiButtonLabel;
             if (player->GetCoordiMode() == CoordiMode::CDM_WORLD)
@@ -81,7 +84,7 @@ void PropertyEditorPanel::Render()
 
     // TODO: 추후에 RTTI를 이용해서 프로퍼티 출력하기
     if (PickedActor)
-    if (ULightComponentBase* lightObj = Cast<ULightComponentBase>(PickedActor->GetRootComponent()))
+    if (ULightComponentBase* lightObj = Cast<ULightComponentBase>(CurrentComponent))
     {
         ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
         if (ImGui::TreeNodeEx("SpotLight Component", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) // 트리 노드 생성
@@ -159,7 +162,7 @@ void PropertyEditorPanel::Render()
 
     // TODO: 추후에 RTTI를 이용해서 프로퍼티 출력하기
     if (PickedActor)
-    if (UText* textOBj = Cast<UText>(PickedActor->GetRootComponent()))
+    if (UText* textOBj = Cast<UText>(CurrentComponent))
     {
         ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
         if (ImGui::TreeNodeEx("Text Component", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) // 트리 노드 생성
@@ -195,10 +198,16 @@ void PropertyEditorPanel::Render()
 
     // TODO: 추후에 RTTI를 이용해서 프로퍼티 출력하기
     if (PickedActor)
-    if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(PickedActor->GetRootComponent()))
+    if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(CurrentComponent))
     {
         RenderForStaticMesh(StaticMeshComponent);
         RenderForMaterial(StaticMeshComponent);
+    }
+
+    // !TODO : 빌보드 컴포넌트의 경우, 텍스쳐를 변경할 수 있도록 추가
+    if (UBillboardComponent* BillboardComponent = Cast<UBillboardComponent>(CurrentComponent))
+    {
+
     }
     ImGui::End();
 }

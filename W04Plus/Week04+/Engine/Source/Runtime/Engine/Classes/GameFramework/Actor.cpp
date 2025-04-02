@@ -1,7 +1,8 @@
-﻿#include "Actor.h"
+#include "Actor.h"
 
 #include "World.h"
 
+REGISTER_CLASS(AActor, UObject)
 void AActor::BeginPlay()
 {
     // TODO: 나중에 삭제를 Pending으로 하던가 해서 복사비용 줄이기
@@ -16,10 +17,13 @@ void AActor::Tick(float DeltaTime)
 {
     // TODO: 임시로 Actor에서 Tick 돌리기
     // TODO: 나중에 삭제를 Pending으로 하던가 해서 복사비용 줄이기
-    const auto CopyComponents = OwnedComponents;
-    for (UActorComponent* Comp : CopyComponents)
+    //const auto CopyComponents = OwnedComponents;
+    for (UActorComponent* Comp : OwnedComponents)
     {
-        Comp->TickComponent(DeltaTime);
+        if (Comp && Comp->bIsComponentTickEnabled())
+        {
+            Comp->TickComponent(DeltaTime);
+        }
     }
 }
 

@@ -1,7 +1,8 @@
-﻿#include "OutlinerEditorPanel.h"
+#include "OutlinerEditorPanel.h"
 #include "EngineLoop.h"
 #include "World.h"
 #include "GameFramework/Actor.h"
+#include "Engine/Classes/Components/ActorComponent.h"
 
 
 void OutlinerEditorPanel::Render()
@@ -33,18 +34,55 @@ void OutlinerEditorPanel::Render()
     /* Render Start */
     ImGui::Begin("Outliner", nullptr, PanelFlags);
 
-    if (ImGui::TreeNode("Primitives")) // 트리 노드 생성
+    if (ImGui::TreeNode("Scene Actors")) // 트리 노드 생성
     {
         UWorld* World = GEngineLoop.GetWorld();
         for (AActor* Actor : World->GetActors())
         {
-            if (ImGui::Selectable(*Actor->GetActorLabel(), World->GetSelectedActor() == Actor))
+            bool bIsActorSelected = World->GetSelectedActor() == Actor;
+
+            if (bIsActorSelected)
             {
-                World->SetPickedActor(Actor);
-                break;
+                RenderAddComponentCombo(Actor);
+            }
+
+            ImGuiTreeNodeFlags NodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+
+            // 선택된 액터 처리
+            if (bIsActorSelected)
+            {
+                NodeFlags |= ImGuiTreeNodeFlags_Selected;
+                NodeFlags |= ImGuiTreeNodeFlags_DefaultOpen; // 선택 시 자동으로 열기
+            }
+
+
+            //FString ActorName = Actor->GetActorLabel() + TEXT("(") + Actor->GetClass()->GetName() + TEXT(")");
+            if (ImGui::TreeNodeEx(Actor, NodeFlags, "%s", *Actor->GetActorLabel()))
+            {
+                if (ImGui::IsItemClicked())
+                {
+                    World->SetPickedActor(Actor);
+                }
+
+                const auto& Components = Actor->GetComponents();
+                for (UActorComponent* Component : Components)
+                {
+                    USceneComponent* SceneComponent = Cast<USceneComponent>(Component);
+                    if (SceneComponent == nullptr)
+                        continue;
+
+                    bool bIsComponentSelected = World->GetSelectedComponent() == SceneComponent;
+
+                    if (ImGui::Selectable(*SceneComponent->GetName(), bIsComponentSelected))
+                    {
+                        World->SetPickedComponent(SceneComponent);
+                    }
+                }
+
+                ImGui::TreePop(); // Actor 노드 닫기
             }
         }
-        ImGui::TreePop(); // 트리 닫기
+        ImGui::TreePop(); // Scene Actors 트리 닫기
     }
     ImGui::End();
 }
@@ -55,4 +93,14 @@ void OutlinerEditorPanel::OnResize(HWND hWnd)
     GetClientRect(hWnd, &clientRect);
     Width = clientRect.right - clientRect.left;
     Height = clientRect.bottom - clientRect.top;
+}
+
+void OutlinerEditorPanel::RenderAddComponentCombo(AActor* SelectedActor)
+{
+    if (SelectedActor == nullptr)
+        return;
+
+    static int SelectedComponentType = 0;
+    static TArray<FString> ComponentTypes;
+    static bool bTypesInitialized = false;
 }
