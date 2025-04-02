@@ -1,6 +1,7 @@
 // ReSharper disable CppClangTidyBugproneMacroParentheses
 #pragma once
 #include "UClass.h"
+#include "ObjectFactory.h"
 
 // name을 문자열화 해주는 매크로
 #define INLINE_STRINGIFY(name) #name
@@ -26,7 +27,10 @@ public: \
     using ThisClass = TClass; \
     static UClass TClass##_StaticClass{ TEXT(#TClass), static_cast<uint32>(sizeof(TClass)), static_cast<uint32>(alignof(TClass)), TSuperClass::StaticClass() }; \
     struct TClass##_ClassInfo { \
-        TClass##_ClassInfo() { UClass::RegisterClass(&TClass##_StaticClass); } \
+        TClass##_ClassInfo() { \
+            TClass##_StaticClass.Creator = []() -> void* { return FObjectFactory::ConstructObject<TClass>(); }; \
+            UClass::RegisterClass(&TClass##_StaticClass); \
+        } \
     }; \
     static TClass##_ClassInfo TClass##_AutoRegister;
 

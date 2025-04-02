@@ -18,6 +18,19 @@ public:
     UClass(UClass&&) = delete;
     UClass& operator=(UClass&&) = delete;
 
+    using ObjectCreator = void* (*)();
+    ObjectCreator Creator = nullptr;
+
+    template <typename T>
+    T* CreateObject()
+    {
+        if (!Creator)
+        {
+            return nullptr;
+        }
+        return static_cast<T*>(Creator());
+    }
+
     uint32 GetClassSize() const { return ClassSize; }
     uint32 GetClassAlignment() const { return ClassAlignment; }
 

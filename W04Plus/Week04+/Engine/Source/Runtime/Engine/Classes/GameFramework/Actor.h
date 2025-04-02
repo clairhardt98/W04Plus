@@ -87,6 +87,10 @@ public:
     bool SetActorScale(const FVector& NewScale);
 
     bool IsActorTickEnabled() const { return bCanEverTick; }
+
+public:
+    UActorComponent* AddComponentByClass(UClass* ComponentClass);
+
 protected:
     USceneComponent* RootComponent = nullptr;
 
@@ -160,3 +164,4 @@ T* AActor::GetComponentByClass()
     }
     return nullptr;
 }
+

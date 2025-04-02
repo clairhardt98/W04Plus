@@ -269,18 +269,21 @@ void PropertyEditorPanel::HSVToRGB(float h, float s, float v, float& r, float& g
 
 void PropertyEditorPanel::RenderForStaticMesh(UStaticMeshComponent* StaticMeshComp)
 {
-    if (StaticMeshComp->GetStaticMesh() == nullptr)
-    {
-        return;
-    }
+    //if (StaticMeshComp->GetStaticMesh() == nullptr)
+    //{
+    //    return;
+    //}
     
+    UStaticMesh* StaticMesh = StaticMeshComp->GetStaticMesh();
+
     ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
     if (ImGui::TreeNodeEx("Static Mesh", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) // 트리 노드 생성
     {
         ImGui::Text("StaticMesh");
         ImGui::SameLine();
 
-        FString PreviewName = StaticMeshComp->GetStaticMesh()->GetRenderData()->DisplayName;
+        FString PreviewName = StaticMesh ? StaticMesh->GetRenderData()->DisplayName : TEXT("None");
+
         const TMap<FWString, UStaticMesh*> Meshes = FManagerOBJ::GetStaticMeshes();
         if (ImGui::BeginCombo("##StaticMesh", GetData(PreviewName), ImGuiComboFlags_None))
         {

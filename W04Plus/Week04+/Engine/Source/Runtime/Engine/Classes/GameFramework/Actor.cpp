@@ -139,3 +139,32 @@ bool AActor::SetActorScale(const FVector& NewScale)
     }
     return false;
 }
+
+UActorComponent* AActor::AddComponentByClass(UClass* ComponentClass)
+{
+    if (ComponentClass == nullptr)
+        return nullptr;
+
+    UActorComponent* Component = ComponentClass->CreateObject<UActorComponent>();
+    if (Component == nullptr)
+        return nullptr;
+
+    OwnedComponents.Add(Component);
+    Component->Owner = this;
+    if (USceneComponent* NewSceneComp = Cast<USceneComponent>(Component))
+    {
+        if (RootComponent == nullptr)
+        {
+            RootComponent = NewSceneComp;
+        }
+        else
+        {
+            NewSceneComp->SetupAttachment(RootComponent);
+        }
+    }
+
+
+    Component->InitializeComponent();
+
+    return Component;
+}

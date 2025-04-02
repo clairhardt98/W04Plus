@@ -24,6 +24,9 @@ UText::~UText()
 void UText::InitializeComponent()
 {
     Super::InitializeComponent();
+    SetTexture(L"Assets/Texture/font.png");
+    SetRowColumnCount(106, 106);
+    SetText(L"안녕하세요 Jungle 1");
 }
 
 void UText::TickComponent(float DeltaTime)
