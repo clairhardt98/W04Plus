@@ -146,6 +146,132 @@ bool UWorld::DestroyActor(AActor* ThisActor)
     return true;
 }
 
+UObject* UWorld::DuplicateObject(const FObjectDuplicationParameters& Params) const
+{
+    UObject* NewObject = Super::DuplicateObject(Params);
+
+    DuplicateProperties(NewObject, Params);
+    return NewObject;
+}
+
+void UWorld::DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const
+{
+    Super::DuplicateProperties(NewObject, Params);
+
+    UWorld* NewWorld = static_cast<UWorld*>(NewObject);
+    if (!NewWorld)
+    {
+        UE_LOG(LogLevel::Error, "DuplicateProperties: NewObject is not UWorld");
+        return;
+    }
+
+    for (AActor* Actor : ActorsArray)
+    {
+        if (Actor)
+        {
+            FObjectDuplicationParameters ActorParams(
+                Actor,
+                NewWorld,
+                NAME_None,
+                Params.DuplicationFlags,
+                Params.bDeepCopy,
+                Params.DuplicationMap ? Params.DuplicationMap : nullptr
+            );
+
+            AActor* DuplicatedActor = Cast<AActor>(Actor->DuplicateObject(ActorParams));
+            if (DuplicatedActor)
+            {
+                NewWorld->ActorsArray.Add(DuplicatedActor);
+            }
+        }
+    }
+
+    for (AActor* Actor : PendingBeginPlayActors)
+    {
+        if (Actor)
+        {
+            FObjectDuplicationParameters ActorParams(
+                Actor,
+                NewWorld,
+                NAME_None,
+                Params.DuplicationFlags,
+                Params.bDeepCopy,
+                Params.DuplicationMap ? Params.DuplicationMap : nullptr
+            );
+            AActor* DuplicatedActor = Cast<AActor>(Actor->DuplicateObject(ActorParams));
+            if (DuplicatedActor)
+            {
+                NewWorld->PendingBeginPlayActors.Add(DuplicatedActor);
+            }
+        }
+    }
+
+    if (camera)
+    {
+        FObjectDuplicationParameters CameraParams(
+            camera,
+            NewWorld,
+            NAME_None,
+            Params.DuplicationFlags,
+            Params.bDeepCopy,
+            Params.DuplicationMap ? Params.DuplicationMap : nullptr
+        );
+        NewWorld->camera = Cast<UCameraComponent>(camera->DuplicateObject(CameraParams));
+    }
+
+    if (LocalGizmo)
+    {
+        FObjectDuplicationParameters GizmoParams(
+            LocalGizmo,
+            NewWorld,
+            NAME_None,
+            Params.DuplicationFlags,
+            Params.bDeepCopy,
+            Params.DuplicationMap ? Params.DuplicationMap : nullptr
+        );
+        NewWorld->LocalGizmo = Cast<UTransformGizmo>(LocalGizmo->DuplicateObject(GizmoParams));
+    }
+
+    if (EditorPlayer)
+    {
+        FObjectDuplicationParameters EditorParams(
+            EditorPlayer,
+            NewWorld,
+            NAME_None,
+            Params.DuplicationFlags,
+            Params.bDeepCopy,
+            Params.DuplicationMap ? Params.DuplicationMap : nullptr
+        );
+        NewWorld->EditorPlayer = Cast<AEditorPlayer>(EditorPlayer->DuplicateObject(EditorParams));
+    }
+
+    if (worldGizmo)
+    {
+        FObjectDuplicationParameters WorldGizmoParams(
+            worldGizmo,
+            NewWorld,
+            NAME_None,
+            Params.DuplicationFlags,
+            Params.bDeepCopy,
+            Params.DuplicationMap ? Params.DuplicationMap : nullptr
+        );
+        NewWorld->worldGizmo = worldGizmo->DuplicateObject(WorldGizmoParams);
+    }
+
+    if (pickingGizmo)
+    {
+        FObjectDuplicationParameters PickingGizmoParams(
+            pickingGizmo,
+            NewWorld,
+            NAME_None,
+            Params.DuplicationFlags,
+            Params.bDeepCopy,
+            Params.DuplicationMap ? Params.DuplicationMap : nullptr
+        );
+        NewWorld->SetPickingGizmo(pickingGizmo->DuplicateObject(PickingGizmoParams));
+    }
+}
+
 void UWorld::SetPickingGizmo(UObject* Object)
 {
 	pickingGizmo = Cast<USceneComponent>(Object);

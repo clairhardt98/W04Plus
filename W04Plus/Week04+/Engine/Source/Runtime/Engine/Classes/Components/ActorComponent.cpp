@@ -37,6 +37,34 @@ void UActorComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
     bHasBegunPlay = false;
 }
 
+UObject* UActorComponent::DuplicateObject(const FObjectDuplicationParameters& Params) const
+{
+    UObject* NewObject = Super::DuplicateObject(Params);
+
+    DuplicateProperties(NewObject, Params);
+    return NewObject;
+}
+
+void UActorComponent::DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const
+{
+    Super::DuplicateProperties(NewObject, Params);
+
+    UActorComponent* NewComponent = static_cast<UActorComponent*>(NewObject);
+    if (!NewComponent)
+    {
+        UE_LOG(LogLevel::Error, "DuplicateProperties: NewObject is not UActorComponent");
+        return;
+    }
+
+    // 이렇게 하는게 아닌가
+    NewComponent->Owner = this->Owner;
+    NewComponent->bHasBeenInitialized = this->bHasBeenInitialized;
+    NewComponent->bHasBegunPlay = this->bHasBegunPlay;
+    NewComponent->bIsBeingDestroyed = this->bIsBeingDestroyed;
+    NewComponent->bIsActive = this->bIsActive;
+    NewComponent->bAutoActive = this->bAutoActive;
+}
+
 void UActorComponent::DestroyComponent()
 {
     if (bIsBeingDestroyed)

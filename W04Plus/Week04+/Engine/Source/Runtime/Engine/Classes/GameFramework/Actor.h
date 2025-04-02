@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Components/SceneComponent.h"
 #include "Container/Set.h"
 #include "Engine/EngineTypes.h"
@@ -26,6 +26,7 @@ public:
     /** Actor가 제거될 때 호출됩니다. */
     virtual void Destroyed();
 
+
     /**
      * 액터가 게임 플레이를 종료할 때 호출되는 함수입니다.
      *
@@ -33,6 +34,9 @@ public:
      * @note Destroyed와는 다른점은, EndPlay는 레벨 전환, 게임 종료, 또는 Destroy() 호출 시 항상 실행됩니다.
      */
     virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
+
+    virtual UObject* DuplicateObject(const FObjectDuplicationParameters& Params) const override;
+    virtual void DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const override;
 
 public:
     /** 이 Actor를 제거합니다. */

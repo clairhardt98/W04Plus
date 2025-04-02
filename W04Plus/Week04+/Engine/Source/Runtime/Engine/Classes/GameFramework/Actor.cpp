@@ -1,4 +1,4 @@
-﻿#include "Actor.h"
+#include "Actor.h"
 
 #include "World.h"
 
@@ -40,6 +40,66 @@ void AActor::EndPlay(const EEndPlayReason::Type EndPlayReason)
         }
     }
     UninitializeComponents();
+}
+
+UObject* AActor::DuplicateObject(const FObjectDuplicationParameters& Params) const
+{
+    UObject* NewObject = Super::DuplicateObject(Params);
+    DuplicateProperties(this->GetClass(), Params);
+
+    return NewObject;
+}
+
+void AActor::DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const
+{
+    Super::DuplicateProperties(NewObject, Params);
+
+    AActor* NewActor = static_cast<AActor*>(NewObject);
+    if (!NewActor)
+    {
+        UE_LOG(LogLevel::Error, "DuplicateProperties: NewObject is not AActor");
+        return;
+    }
+
+    for (UActorComponent* Comp : OwnedComponents)
+    {
+        if (Comp)
+        {
+            // 각 컴포넌트에 대해 동일한 Outer와 DuplicationMap을 사용하여 복제
+            FObjectDuplicationParameters CompParams(
+                Comp,
+                Params.Outer, // 또는 NewActor를 Outer로 사용할 수도 있음
+                NAME_None,
+                Params.DuplicationFlags,
+                Params.bDeepCopy,
+                Params.DuplicationMap ? Params.DuplicationMap : nullptr // 이미 부모에서 로컬 맵을 생성했을 수도 있음
+            );
+
+            UActorComponent* DuplicatedComp = static_cast<UActorComponent*>(Comp->DuplicateObject(CompParams));
+            if (DuplicatedComp)
+            {
+                NewActor->OwnedComponents.Add(DuplicatedComp);
+                DuplicatedComp->Owner = NewActor;
+            }
+        }
+    }
+
+    //// RootComponent가 존재한다면 이를 복제합니다.
+    //if (RootComponent)
+    //{
+    //    FObjectDuplicationParameters RootParams(
+    //        RootComponent,
+    //        Params.Outer, // 또는 NewActor
+    //        NAME_None,
+    //        Params.DuplicationFlags,
+    //        Params.bDeepCopy,
+    //        Params.DuplicationMap ? Params.DuplicationMap : nullptr
+    //    );
+    //    // USceneComponent는 UObject의 파생 클래스이므로 DuplicateObject를 호출할 수 있습니다.
+    //    USceneComponent* DuplicatedRoot = Cast<USceneComponent>(RootComponent->DuplicateObject(RootParams));
+    //    NewActor->RootComponent = DuplicatedRoot;
+    //}
+
 }
 
 bool AActor::Destroy()
