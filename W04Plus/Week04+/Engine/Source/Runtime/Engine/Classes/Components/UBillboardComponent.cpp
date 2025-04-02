@@ -35,6 +35,11 @@ void UBillboardComponent::InitializeComponent()
     Super::InitializeComponent();
 	CreateQuadTextureVertexBuffer();
     SetTexture(L"Assets/Texture/DefaultTexture.png");
+    if (GetOwner() && GetOwner()->GetRootComponent())
+    {
+        SetUUIDParent(GetOwner()->GetRootComponent());
+    }
+    
 }
 
 

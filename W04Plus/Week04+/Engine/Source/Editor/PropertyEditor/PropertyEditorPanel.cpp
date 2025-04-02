@@ -39,20 +39,20 @@ void PropertyEditorPanel::Render()
     ImGui::Begin("Detail", nullptr, PanelFlags);
     
     AEditorPlayer* player = GEngineLoop.GetWorld()->GetEditorPlayer();
-    AActor* PickedActor = GEngineLoop.GetWorld()->GetSelectedActor();
+    //AActor* PickedActor = GEngineLoop.GetWorld()->GetSelectedActor();
     USceneComponent* PickedComponent = GEngineLoop.GetWorld()->GetSelectedComponent();
 
-    USceneComponent* CurrentComponent = PickedComponent ? PickedComponent : PickedActor ? PickedActor->GetRootComponent() : nullptr;
-    if (CurrentComponent)
+    //USceneComponent* CurrentComponent = PickedComponent ? PickedComponent : PickedActor ? PickedActor->GetRootComponent() : nullptr;
+    if (PickedComponent)
     {
         ImGui::SetItemDefaultFocus();
         // TreeNode 배경색을 변경 (기본 상태)
         ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
         if (ImGui::TreeNodeEx("Transform", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) // 트리 노드 생성
         {
-            Location = CurrentComponent->GetLocalLocation();
-            Rotation = CurrentComponent->GetLocalRotation();
-            Scale = CurrentComponent->GetLocalScale();
+            Location = PickedComponent->GetLocalLocation();
+            Rotation = PickedComponent->GetLocalRotation();
+            Scale = PickedComponent->GetLocalScale();
             
             FImGuiWidget::DrawVec3Control("Location", Location, 0, 85);
             ImGui::Spacing();
@@ -63,9 +63,9 @@ void PropertyEditorPanel::Render()
             FImGuiWidget::DrawVec3Control("Scale", Scale, 0, 85);
             ImGui::Spacing();
 
-            CurrentComponent->SetLocation(Location);
-            CurrentComponent->SetRotation(Rotation);
-            CurrentComponent->SetScale(Scale);
+            PickedComponent->SetLocation(Location);
+            PickedComponent->SetRotation(Rotation);
+            PickedComponent->SetScale(Scale);
             
             std::string coordiButtonLabel;
             if (player->GetCoordiMode() == CoordiMode::CDM_WORLD)
@@ -83,8 +83,8 @@ void PropertyEditorPanel::Render()
     }
 
     // TODO: 추후에 RTTI를 이용해서 프로퍼티 출력하기
-    if (PickedActor)
-    if (ULightComponentBase* lightObj = Cast<ULightComponentBase>(CurrentComponent))
+    if (PickedComponent)
+    if (ULightComponentBase* lightObj = Cast<ULightComponentBase>(PickedComponent))
     {
         ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
         if (ImGui::TreeNodeEx("SpotLight Component", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) // 트리 노드 생성
@@ -161,8 +161,8 @@ void PropertyEditorPanel::Render()
     }
 
     // TODO: 추후에 RTTI를 이용해서 프로퍼티 출력하기
-    if (PickedActor)
-    if (UText* textOBj = Cast<UText>(CurrentComponent))
+    if (PickedComponent)
+    if (UText* textOBj = Cast<UText>(PickedComponent))
     {
         ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
         if (ImGui::TreeNodeEx("Text Component", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) // 트리 노드 생성
@@ -197,17 +197,17 @@ void PropertyEditorPanel::Render()
     }
 
     // TODO: 추후에 RTTI를 이용해서 프로퍼티 출력하기
-    if (PickedActor)
-    if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(CurrentComponent))
+    if (PickedComponent)
+    if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(PickedComponent))
     {
         RenderForStaticMesh(StaticMeshComponent);
         RenderForMaterial(StaticMeshComponent);
     }
 
     // !TODO : 빌보드 컴포넌트의 경우, 텍스쳐를 변경할 수 있도록 추가
-    if (UBillboardComponent* BillboardComponent = Cast<UBillboardComponent>(CurrentComponent))
+    if (UBillboardComponent* BillboardComponent = Cast<UBillboardComponent>(PickedComponent))
     {
-
+        RenderForBillboard(BillboardComponent);
     }
     ImGui::End();
 }
@@ -577,6 +577,39 @@ void PropertyEditorPanel::RenderCreateMaterialView()
     }
 
     ImGui::End();
+}
+
+void PropertyEditorPanel::RenderForBillboard(UBillboardComponent* BillboardComp)
+{
+    if (!BillboardComp) return;
+
+    auto& TextureMap = FEngineLoop::resourceMgr.GetTextureMap();
+    if (TextureMap.IsEmpty()) return;
+
+    // 콤보박스 레이블에 현재 선택된 텍스처 표시
+    if (ImGui::BeginCombo("Texture", "Select Texture"))
+    {
+        for (const auto& kvp : TextureMap)
+        {
+            FWString TextureName = kvp.Key;
+            std::string ansiName(TextureName.begin(), TextureName.end());
+
+            if (ImGui::Selectable(ansiName.c_str(), false))
+            {
+                // 선택 시 바로 텍스처 적용
+                BillboardComp->SetTexture(TextureName);
+            }
+        }
+        ImGui::EndCombo();
+    }
+
+    // 선택된 텍스처 미리보기 (옵션)
+    //if (!CurrentTextureName.empty())
+    //{
+    //    ImGui::Text("Preview:");
+    //    ImTextureID texId = (ImTextureID)BillboardComp->GetTextureID();
+    //    ImGui::Image(texId, ImVec2(100, 100));
+    //}
 }
 
 void PropertyEditorPanel::OnResize(HWND hWnd)

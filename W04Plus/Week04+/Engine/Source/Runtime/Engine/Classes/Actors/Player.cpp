@@ -120,10 +120,14 @@ void AEditorPlayer::Input()
     if (GetAsyncKeyState(VK_DELETE) & 0x8000)
     {
         UWorld* World = GetWorld();
-        if (AActor* PickedActor = World->GetSelectedActor())
+        USceneComponent* SelectedComponent = World->GetSelectedComponent();
+        if (!SelectedComponent)
+            return;
+
+        if (AActor* PickedActor = World->GetSelectedComponent()->GetOwner())
         {
             World->DestroyActor(PickedActor);
-            World->SetPickedActor(nullptr);
+            World->SetPickedComponent(nullptr);
         }
     }
 }
@@ -131,7 +135,7 @@ void AEditorPlayer::Input()
 bool AEditorPlayer::PickGizmo(FVector& pickPosition)
 {
     bool isPickedGizmo = false;
-    if (GetWorld()->GetSelectedActor())
+    if (GetWorld()->GetSelectedComponent())
     {
         if (cMode == CM_TRANSLATION)
         {
@@ -223,7 +227,7 @@ void AEditorPlayer::PickActor(const FVector& pickPosition)
 {
     if (!(ShowFlags::GetInstance().currentFlags & EEngineShowFlags::SF_Primitives)) return;
 
-    const UActorComponent* Possible = nullptr;
+    USceneComponent* Possible = nullptr;
     int maxIntersect = 0;
     float minDistance = FLT_MAX;
     for (const auto iter : TObjectRange<UPrimitiveComponent>())
@@ -260,7 +264,7 @@ void AEditorPlayer::PickActor(const FVector& pickPosition)
     }
     if (Possible)
     {
-        GetWorld()->SetPickedActor(Possible->GetOwner());
+        GetWorld()->SetPickedComponent(Possible);
     }
 }
 
@@ -350,7 +354,7 @@ int AEditorPlayer::RayIntersectsObject(const FVector& pickPosition, USceneCompon
 
 void AEditorPlayer::PickedObjControl()
 {
-    if (GetWorld()->GetSelectedActor() && GetWorld()->GetPickingGizmo())
+    if (GetWorld()->GetSelectedComponent() && GetWorld()->GetPickingGizmo())
     {
         POINT currentMousePos;
         GetCursorPos(&currentMousePos);
@@ -358,20 +362,19 @@ void AEditorPlayer::PickedObjControl()
         int32 deltaY = currentMousePos.y - m_LastMousePos.y;
 
         // USceneComponent* pObj = GetWorld()->GetPickingObj();
-        AActor* PickedActor = GetWorld()->GetSelectedActor();
         USceneComponent* PickedComponent = GetWorld()->GetSelectedComponent();
         UGizmoBaseComponent* Gizmo = static_cast<UGizmoBaseComponent*>(GetWorld()->GetPickingGizmo());
         switch (cMode)
         {
         case CM_TRANSLATION:
-            ControlTranslation(PickedActor->GetRootComponent(), Gizmo, deltaX, deltaY);
+            ControlTranslation(PickedComponent, Gizmo, deltaX, deltaY);
             break;
         case CM_SCALE:
-            ControlScale(PickedActor->GetRootComponent(), Gizmo, deltaX, deltaY);
+            ControlScale(PickedComponent, Gizmo, deltaX, deltaY);
 
             break;
         case CM_ROTATION:
-            ControlRotation(PickedActor->GetRootComponent(), Gizmo, deltaX, deltaY);
+            ControlRotation(PickedComponent, Gizmo, deltaX, deltaY);
             break;
         default:
             break;

@@ -39,7 +39,7 @@ void OutlinerEditorPanel::Render()
         UWorld* World = GEngineLoop.GetWorld();
         for (AActor* Actor : World->GetActors())
         {
-            bool bIsActorSelected = World->GetSelectedActor() == Actor;
+            bool bIsActorSelected = Actor->GetRootComponent() && Actor->GetRootComponent() == World->GetSelectedComponent();
 
             if (bIsActorSelected)
             {
@@ -61,7 +61,7 @@ void OutlinerEditorPanel::Render()
             {
                 if (ImGui::IsItemClicked())
                 {
-                    World->SetPickedActor(Actor);
+                    World->SetPickedComponent(Actor->GetRootComponent());
                 }
 
                 const auto& Components = Actor->GetComponents();

@@ -271,9 +271,10 @@ void ControlEditorPanel::CreateModifyButton(ImVec2 ButtonSize, ImFont* IconFont)
                 }
                 case OBJ_CUBE:
                 {
-                    AStaticMeshActor* TempActor = World->SpawnActor<AStaticMeshActor>();
-                    TempActor->SetActorLabel(TEXT("OBJ_CUBE"));
-                    UStaticMeshComponent* MeshComp = TempActor->GetStaticMeshComponent();
+                    SpawnedActor = World->SpawnActor<AStaticMeshActor>();
+                    SpawnedActor->SetActorLabel(TEXT("OBJ_CUBE"));
+                    AStaticMeshActor* StaticMeshActor = Cast<AStaticMeshActor>(SpawnedActor);
+                    UStaticMeshComponent* MeshComp = StaticMeshActor->GetStaticMeshComponent();
                     FManagerOBJ::CreateStaticMesh("Assets/helloBlender.obj");
                     MeshComp->SetStaticMesh(FManagerOBJ::GetStaticMesh(L"helloBlender.obj"));
                     break;
@@ -313,7 +314,7 @@ void ControlEditorPanel::CreateModifyButton(ImVec2 ButtonSize, ImFont* IconFont)
         
                 if (SpawnedActor)
                 {
-                    World->SetPickedActor(SpawnedActor);
+                    World->SetPickedComponent(SpawnedActor->GetRootComponent());
                 }
             }
         }
