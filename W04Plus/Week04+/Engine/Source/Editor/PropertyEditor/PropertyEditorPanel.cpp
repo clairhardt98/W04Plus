@@ -587,7 +587,12 @@ void PropertyEditorPanel::RenderForBillboard(UBillboardComponent* BillboardComp)
     if (TextureMap.IsEmpty()) return;
 
     // 콤보박스 레이블에 현재 선택된 텍스처 표시
-    if (ImGui::BeginCombo("Texture", "Select Texture"))
+    FTexture* CurrentTexture = BillboardComp->Texture.get();
+
+    std::string currentAnsiName = CurrentTexture ? *CurrentTexture->Name : "None";
+
+        
+    if (ImGui::BeginCombo("Texture", currentAnsiName.c_str()))
     {
         for (const auto& kvp : TextureMap)
         {
