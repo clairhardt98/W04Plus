@@ -4,6 +4,8 @@
 #include "Renderer/Renderer.h"
 #include "Engine/ResourceMgr.h"
 
+#include "UObject/ObjectTypes.h"
+
 class UnrealEd;
 class UImGuiManager;
 class UWorld;
@@ -29,6 +31,12 @@ private:
     void WindowInit(HINSTANCE hInstance);
 
 public:
+    void StartPlayInEditor();
+
+    void StopPlayInEditor();
+
+    EWorldType GetWorldType() { return CurrentWorldType; }
+public:
     static FGraphicsDevice graphicDevice;
     static FRenderer renderer;
     static FResourceMgr resourceMgr;
@@ -41,12 +49,14 @@ public:
 private:
     UImGuiManager* UIMgr;
     UWorld* GWorld;
+    UWorld* OriginalWorld;
     SLevelEditor* LevelEditor;
     UnrealEd* UnrealEditor;
     bool bIsExit = false;
     const int32 targetFPS = 60;
     bool bTestInput = false;
 
+    EWorldType CurrentWorldType = EWorldType::Editor;
 public:
     UWorld* GetWorld() const { return GWorld; }
     SLevelEditor* GetLevelEditor() const { return LevelEditor; }

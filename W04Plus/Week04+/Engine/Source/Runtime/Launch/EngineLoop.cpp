@@ -8,6 +8,7 @@
 #include "UnrealClient.h"
 #include "slate/Widgets/Layout/SSplitter.h"
 #include "LevelEditor/SLevelEditor.h"
+#include "CoreUObject/UObject/Casts.h"
 
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -241,6 +242,42 @@ void FEngineLoop::Input()
     else
     {
         bTestInput = false;
+    }
+}
+void FEngineLoop::StartPlayInEditor()
+{
+    OriginalWorld = GWorld;
+
+    UWorld* PIEWorld = Cast<UWorld>(OriginalWorld->Duplicate(nullptr, nullptr));
+    if (PIEWorld)
+    {
+        UE_LOG(LogLevel::Display, "World duplicated for PIE mode.");
+        GWorld = PIEWorld;
+    }
+    else
+    {
+        UE_LOG(LogLevel::Error, "Failed to duplicate World for PIE mode.");
+    }
+    renderer.ClearRenderArr();
+}
+
+void FEngineLoop::StopPlayInEditor()
+{
+    if (OriginalWorld)
+    {
+        if (GWorld && GWorld != OriginalWorld)
+        {
+            GWorld->Release();
+            delete GWorld;
+        }
+
+        GWorld = OriginalWorld;
+        OriginalWorld = nullptr;
+        UE_LOG(LogLevel::Display, "PIE stopped. Restored original world.");
+    }
+    else
+    {
+        UE_LOG(LogLevel::Warning, "StopPIE: OriginalWorld is null; PIE might not have been started.");
     }
 }
 

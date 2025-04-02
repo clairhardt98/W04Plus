@@ -1,4 +1,5 @@
 #include "MeshComponent.h"
+#include "CoreUObject/UObject/Casts.h"
 
 REGISTER_CLASS(UMeshComponent, UPrimitiveComponent)
 UMaterial* UMeshComponent::GetMaterial(uint32 ElementIndex) const
@@ -53,4 +54,11 @@ void UMeshComponent::GetUsedMaterials(TArray<UMaterial*>& Out) const
             Out.Add(Material);
         }
     }
+}
+
+UObject* UMeshComponent::Duplicate(UObject* Outer, UClass* ClassInfo)
+{
+    UMeshComponent* NewComponent = Cast<UMeshComponent>(Super::Duplicate(Outer, ClassInfo));
+    NewComponent->OverrideMaterials = OverrideMaterials;
+    return NewComponent;
 }

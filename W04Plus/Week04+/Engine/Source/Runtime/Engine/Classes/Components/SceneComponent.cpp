@@ -3,6 +3,7 @@
 #include "Math/JungleMath.h"
 #include "UObject/ObjectFactory.h"
 #include "UTextUUID.h"
+#include "CoreUObject/UObject/Casts.h"
 
 REGISTER_CLASS(USceneComponent, UActorComponent)
 USceneComponent::USceneComponent() :RelativeLocation(FVector(0.f, 0.f, 0.f)), RelativeRotation(FVector(0.f, 0.f, 0.f)), RelativeScale3D(FVector(1.f, 1.f, 1.f))
@@ -126,4 +127,14 @@ void USceneComponent::SetupAttachment(USceneComponent* InParent)
         AttachParent = InParent;
         InParent->AttachChildren.AddUnique(this);
     }
+}
+
+UObject* USceneComponent::Duplicate(UObject* Outer, UClass* ClassInfo)
+{
+    USceneComponent* NewComponent = Cast<USceneComponent>(Super::Duplicate(Outer, ClassInfo));
+    NewComponent->RelativeLocation = RelativeLocation;
+    NewComponent->RelativeRotation = RelativeRotation;
+    NewComponent->QuatRotation = QuatRotation;
+    NewComponent->RelativeScale3D = RelativeScale3D;
+    return NewComponent;
 }

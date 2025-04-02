@@ -58,6 +58,11 @@ public:
     void Activate();
     void Deactivate();
 
+public:
+    UObject* Duplicate(UObject* Outer, UClass* ClassInfo) override;
+    void DuplicateSiblings(UObject* Outer) override;
+
+
 private:
     AActor* Owner;
 

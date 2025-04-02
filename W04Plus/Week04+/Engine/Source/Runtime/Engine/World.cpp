@@ -144,3 +144,51 @@ void UWorld::SetPickingGizmo(UObject* Object)
 {
 	pickingGizmo = Cast<USceneComponent>(Object);
 }
+
+AActor* UWorld::SpawnActorByClass(UClass* ActorClass, bool bCallBeginPlay)
+{
+    if (ActorClass == nullptr)
+        return nullptr;
+
+    AActor* Actor = ActorClass->CreateObject<AActor>();
+    if (Actor == nullptr)
+        return nullptr;
+
+    ActorsArray.Add(Actor);
+
+    if (bCallBeginPlay)
+    {
+        PendingBeginPlayActors.Add(Actor);
+    }
+
+    return Actor;
+}
+
+void UWorld::DuplicateSiblings(UObject* Outer)
+{
+    UWorld* NewWorld = Cast<UWorld>(Outer);
+
+    // 원본 월드의 액터 Array를 순회하면서 복제함
+    for (AActor* Actor : ActorsArray)
+    {
+        FString ActorName = Actor->GetClass()->GetName();
+        UClass* ClassInfo = UClass::FindClass(ActorName);
+        if (ClassInfo)
+        {
+            // Duplicate 넘겨줄 때, Outer가 누군지, ClassInfo가 뭔지 넘겨줘야 함
+            Actor->Duplicate(NewWorld, ClassInfo);
+        }
+    }
+}
+
+UObject* UWorld::Duplicate(UObject* Outer, UClass* ClassInfo)
+{
+    // Sibling들 복제(Actor)
+    UWorld* NewWorld = FObjectFactory::ConstructObject<UWorld>();
+    DuplicateSiblings(NewWorld);
+
+    // !TODO : 내 프로퍼티들 복제
+    NewWorld->CreateBaseObject();
+
+    return NewWorld;
+}

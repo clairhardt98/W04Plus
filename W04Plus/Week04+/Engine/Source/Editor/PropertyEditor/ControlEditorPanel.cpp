@@ -58,6 +58,9 @@ void ControlEditorPanel::Render()
 
     ImGui::SameLine();
 
+    CreatePIEButton(IconSize, IconFont);
+
+    ImGui::SameLine();
     /* Get Window Content Region */
     float ContentWidth = ImGui::GetWindowContentRegionMax().x;
 
@@ -420,6 +423,8 @@ void ControlEditorPanel::CreateFlagButton() const
 void ControlEditorPanel::CreateSRTButton(ImVec2 ButtonSize) const
 {
     AEditorPlayer* Player = GEngineLoop.GetWorld()->GetEditorPlayer();
+    if (Player == nullptr)
+        return;
 
     ImVec4 ActiveColor = ImVec4(0.00f, 0.00f, 0.85f, 1.0f);
     
@@ -467,6 +472,34 @@ void ControlEditorPanel::CreateSRTButton(ImVec2 ButtonSize) const
     {
         ImGui::PopStyleColor();
     }
+}
+// test
+void ControlEditorPanel::CreatePIEButton(ImVec2 ButtonSize, ImFont* IconFont)
+{
+    //ImGui::SameLine();
+
+    ImVec4 ActiveColor = ImVec4(0.00f, 0.00f, 0.85f, 1.0f);
+
+    UWorld* World = GEngineLoop.GetWorld();
+    EWorldType WorldType = GEngineLoop.GetWorldType();
+
+    ImGui::PushFont(IconFont);
+    if (WorldType == EWorldType::Editor)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Button, ActiveColor);
+    }
+    if (ImGui::Button("\e923 ", ButtonSize))// Play
+    {
+        GEngineLoop.StartPlayInEditor();
+    }
+
+    if (WorldType == EWorldType::Editor)
+    {
+        ImGui::PopStyleColor();
+    }
+
+    ImGui::PopFont();
+
 }
 
 uint64 ControlEditorPanel::ConvertSelectionToFlags(const bool selected[]) const

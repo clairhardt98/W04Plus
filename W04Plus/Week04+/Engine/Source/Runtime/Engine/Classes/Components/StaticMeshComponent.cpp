@@ -4,6 +4,7 @@
 #include "Launch/EngineLoop.h"
 #include "UObject/ObjectFactory.h"
 #include "UnrealEd/PrimitiveBatch.h"
+#include "CoreUObject/UObject/Casts.h"
 
 REGISTER_CLASS(UStaticMeshComponent, UMeshComponent)
 uint32 UStaticMeshComponent::GetNumMaterials() const
@@ -110,4 +111,13 @@ int UStaticMeshComponent::CheckRayIntersection(FVector& rayOrigin, FVector& rayD
 
     }
     return nIntersections;
+}
+
+UObject* UStaticMeshComponent::Duplicate(UObject* Outer, UClass* ClassInfo)
+{
+    UStaticMeshComponent* NewComponent = Cast<UStaticMeshComponent>(Super::Duplicate(Outer, ClassInfo));
+    NewComponent->staticMesh = staticMesh;
+    NewComponent->selectedSubMeshIndex = selectedSubMeshIndex;
+
+    return NewComponent;
 }
