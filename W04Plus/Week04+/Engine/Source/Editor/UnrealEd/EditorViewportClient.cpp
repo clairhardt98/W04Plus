@@ -119,15 +119,15 @@ void FEditorViewportClient::Input()
         bRightMouseDown = false; // 마우스 오른쪽 버튼을 떼면 상태 초기화
     }
 
-    // Focus Selected Actor
+    // Focus Selected Component
     if (GetAsyncKeyState('F') & 0x8000)
     {
-        if (AActor* PickedActor = GEngineLoop.GetWorld()->GetSelectedActor())
+        if (USceneComponent* PickedComponent = GEngineLoop.GetWorld()->GetSelectedComponent())
         {
             FViewportCameraTransform& ViewTransform = ViewTransformPerspective;
             ViewTransform.SetLocation(
                 // TODO: 10.0f 대신, 정점의 min, max의 거리를 구해서 하면 좋을 듯
-                PickedActor->GetActorLocation() - (ViewTransform.GetForwardVector() * 10.0f)
+                PickedComponent->GetLocalLocation() - (ViewTransform.GetForwardVector() * 10.0f)
             );
         }
     }
