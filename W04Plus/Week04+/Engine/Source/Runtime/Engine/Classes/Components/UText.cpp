@@ -89,7 +89,7 @@ void UText::SetText(FWString _text)
 
     for (int i = 0; i < _text.size(); i++)
     {
-        FVertexTexture leftUP = { 0.0f,1.0f,1.0f,0.0f,0.0f };
+         FVertexTexture leftUP = { 0.0f,1.0f,1.0f,0.0f,0.0f };
         FVertexTexture rightUP = { 0.0f, -1.0f,1.0f,1.0f,0.0f };
         FVertexTexture leftDown = { 0.0f, 1.0f,-1.0f,0.0f,1.0f };
         FVertexTexture rightDown = { 0.0f, -1.0f,-1.0f,1.0f,1.0f };
@@ -288,6 +288,13 @@ void UText::setStartUV(wchar_t hangul, float& outStartU, float& outStartV)
         StartU = 63;
         StartV = 0;
         offset = hangul - L'가'; // 대문자 위치
+    }
+    else
+    {
+        outStartU = 0; 
+        outStartV = 0;
+        offset = 0;
+        return;
     }
 
     if (offset == -1)

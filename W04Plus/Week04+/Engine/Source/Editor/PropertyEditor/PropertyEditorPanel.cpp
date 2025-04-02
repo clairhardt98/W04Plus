@@ -166,38 +166,47 @@ void PropertyEditorPanel::Render()
     if (UText* textOBj = Cast<UText>(CurrentComponent))
     {
         ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
-        if (ImGui::TreeNodeEx("Text Component", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) // 트리 노드 생성
+        if (ImGui::TreeNodeEx("Text Component", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen))
+{
+    if (textOBj) {
+        textOBj->SetTexture(L"Assets/Texture/font.png");
+        textOBj->SetRowColumnCount(106, 106);
+        FWString wText = textOBj->GetText();
+        int len = WideCharToMultiByte(CP_UTF8, 0, wText.c_str(), -1, nullptr, 0, nullptr, nullptr);
+        std::string u8Text(len, '\0');
+        WideCharToMultiByte(CP_UTF8, 0, wText.c_str(), -1, u8Text.data(), len, nullptr, nullptr);
+
+        static char buf[256];
+        // Copy only up to first null character
+        size_t copy_len = strnlen(u8Text.c_str(), sizeof(buf) - 1);
+        strncpy_s(buf, u8Text.c_str(), copy_len);
+        buf[copy_len] = '\0';  // Ensure null-termination
+
+        ImGui::Text("Text: ", buf);
+        ImGui::SameLine();
+        ImGui::PushItemFlag(ImGuiItemFlags_NoNavDefaultFocus, true);
+        if (ImGui::InputText("##Text", buf, 256, ImGuiInputTextFlags_EnterReturnsTrue))
         {
-            if (textOBj) {
-                textOBj->SetTexture(L"Assets/Texture/font.png");
-                textOBj->SetRowColumnCount(106, 106);
-                FWString wText = textOBj->GetText();
-                int len = WideCharToMultiByte(CP_UTF8, 0, wText.c_str(), -1, nullptr, 0, nullptr, nullptr);
-                std::string u8Text(len, '\0');
-                WideCharToMultiByte(CP_UTF8, 0, wText.c_str(), -1, u8Text.data(), len, nullptr, nullptr);
+            // Trim to first null character
+            size_t len = strnlen(buf, sizeof(buf));
+            while (len > 0 && (buf[len - 1] == '\n' || buf[len - 1] == '\r'))
+                buf[--len] = '\0';
 
-                static char buf[256];
-                strcpy_s(buf, u8Text.c_str());
-
-                ImGui::Text("Text: ", buf);
-                ImGui::SameLine();
-                ImGui::PushItemFlag(ImGuiItemFlags_NoNavDefaultFocus, true);
-                if (ImGui::InputText("##Text", buf, 256, ImGuiInputTextFlags_EnterReturnsTrue))
-                {
-                    size_t len = strlen(buf);
-                    while (len > 0 && (buf[len - 1] == '\n' || buf[len - 1] == '\r'))
-                        buf[--len] = '\0';
-
-                    textOBj->ClearText();
-                    int wlen = MultiByteToWideChar(CP_UTF8, 0, buf, -1, nullptr, 0);
-                    FWString newWText(wlen, L'\0');
-                    MultiByteToWideChar(CP_UTF8, 0, buf, -1, newWText.data(), wlen);
-                    textOBj->SetText(newWText);
-                }
-                ImGui::PopItemFlag();
-            }
-            ImGui::TreePop();
+            textOBj->ClearText();
+            int wlen = MultiByteToWideChar(CP_UTF8, 0, buf, -1, nullptr, 0);
+            FWString newWText(wlen, L'\0');
+            MultiByteToWideChar(CP_UTF8, 0, buf, -1, newWText.data(), wlen);
+            textOBj->SetText(newWText);
         }
+        ImGui::PopItemFlag();
+    }
+    bool bBillboard = textOBj->GetBillboardMode();
+    if (ImGui::Checkbox("Enable Billboard", &bBillboard)) {
+        textOBj->SetBillboardMode(bBillboard);
+    }
+
+    ImGui::TreePop();
+}
         ImGui::PopStyleColor();
     }
 

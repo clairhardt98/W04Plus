@@ -33,7 +33,7 @@ public:
 
     ID3D11Buffer* vertexTextBuffer = nullptr;
     UINT numTextVertices = 0;
-
+    bool GetBillboardMode() const { return bBillboardMode; }
 protected:
     FWString text;
     TArray<FVector> quad;
@@ -50,6 +50,7 @@ protected:
     void setStartUV(char alphabet, float& outStartU, float& outStartV);
     void setStartUV(wchar_t hangul, float& outStartU, float& outStartV);
     void CreateTextTextureVertexBuffer(const TArray<FVertexTexture>& _vertex, UINT byteWidth);
+    
 
 private:
     FMatrix CreateBillboardMatrix();
