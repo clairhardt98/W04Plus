@@ -33,6 +33,7 @@ void FResourceMgr::Initialize(FRenderer* renderer, FGraphicsDevice* device)
 	LoadTextureFromDDS(device->Device, device->DeviceContext, L"Assets/Texture/UUID_Font.dds");
 	LoadTextureFromFile(device->Device, device->DeviceContext, L"Assets/Texture/Wooden Crate_Crate_BaseColor.png");
 	LoadTextureFromFile(device->Device, device->DeviceContext, L"Assets/Texture/spotLight.png");
+    LoadTextureFromFile(device->Device, device->DeviceContext, L"Assets/Texture/DefaultTexture.png");
 }
 
 void FResourceMgr::Release(FRenderer* renderer) {

@@ -359,6 +359,7 @@ void AEditorPlayer::PickedObjControl()
 
         // USceneComponent* pObj = GetWorld()->GetPickingObj();
         AActor* PickedActor = GetWorld()->GetSelectedActor();
+        USceneComponent* PickedComponent = GetWorld()->GetSelectedComponent();
         UGizmoBaseComponent* Gizmo = static_cast<UGizmoBaseComponent*>(GetWorld()->GetPickingGizmo());
         switch (cMode)
         {
