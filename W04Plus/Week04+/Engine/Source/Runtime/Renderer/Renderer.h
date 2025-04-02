@@ -146,6 +146,7 @@ public: // line shader
     void RenderLight(UWorld* World, std::shared_ptr<FEditorViewportClient> ActiveViewport);
     void RenderBillboards(UWorld* World,std::shared_ptr<FEditorViewportClient> ActiveViewport);
     void RenderText(UWorld* World, std::shared_ptr<FEditorViewportClient> ActiveViewport);
+    void TextMVPRendering();
 private:
     TArray<UStaticMeshComponent*> StaticMeshObjs;
     TArray<UGizmoBaseComponent*> GizmoObjs;

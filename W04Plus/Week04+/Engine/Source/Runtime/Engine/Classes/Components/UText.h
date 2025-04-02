@@ -25,7 +25,8 @@ public:
     void SetTexture(FWString _fileName);
     void SetBillboardMode(bool bEnable);
     bool CheckPickingOnNDC(const TArray<FVector>& checkQuad, float& hitDistance);
-    void TextMVPRendering();
+    FMatrix CreateBillboardMatrix();
+    FMatrix CreateStandardModelMatrix();
 
     TArray<FVertexTexture> vertexTextureArr;
 
@@ -52,7 +53,5 @@ protected:
     void CreateTextTextureVertexBuffer(const TArray<FVertexTexture>& _vertex, UINT byteWidth);
     
 
-private:
-    FMatrix CreateBillboardMatrix();
-    FMatrix CreateStandardModelMatrix();
+    
 };

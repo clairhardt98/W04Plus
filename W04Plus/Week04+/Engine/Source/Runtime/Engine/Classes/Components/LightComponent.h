@@ -11,6 +11,9 @@ public:
     ULightComponentBase();
     virtual ~ULightComponentBase() override;
 
+    virtual void InitializeComponent() override;
+    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
+
     virtual void TickComponent(float DeltaTime) override;
     virtual int CheckRayIntersection(FVector& rayOrigin, FVector& rayDirection, float& pfNearHitDistance);
     void InitializeLight();

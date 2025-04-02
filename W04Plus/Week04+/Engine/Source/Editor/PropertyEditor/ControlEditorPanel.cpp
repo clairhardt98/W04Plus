@@ -284,7 +284,8 @@ void ControlEditorPanel::CreateModifyButton(ImVec2 ButtonSize, ImFont* IconFont)
                     SpawnedActor = World->SpawnActor<AActor>();
                     SpawnedActor->SetActorLabel(TEXT("OBJ_SpotLight"));
                     SpawnedActor->AddComponent<ULightComponentBase>();
-                    UBillboardComponent* Billboard = SpawnedActor->AddComponent<UBillboardComponent>();
+                   /* UBillboardComponent* Billboard = SpawnedActor->AddComponent<UBillboardComponent>();
+                    Billboard->SetTexture(L"Assets/Texture/T_SpotLight.png");*/
                     break;
                 }
                 case OBJ_PARTICLE:
