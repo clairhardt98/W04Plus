@@ -89,6 +89,11 @@ public:
     bool IsActorTickEnabled() const { return bCanEverTick; }
 
 public:
+    // Duplicate
+    void DuplicateSiblings(UObject* Outer) override;
+    UObject* Duplicate(UObject* Outer, UClass* ClassInfo) override;
+
+public:
     UActorComponent* AddComponentByClass(UClass* ComponentClass);
 
 protected:

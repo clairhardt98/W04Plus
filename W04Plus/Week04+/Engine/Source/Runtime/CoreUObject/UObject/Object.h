@@ -67,6 +67,11 @@ public:
     }
 
 public:
+    virtual void DuplicateSiblings(UObject* Outer) {}
+    virtual UObject* Duplicate(UObject* Outer, UClass* ClassInfo) { return nullptr; }
+
+
+public:
     void* operator new(size_t size)
     {
         UE_LOG(LogLevel::Display, "UObject Created : %d", size);

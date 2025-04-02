@@ -1,4 +1,5 @@
 #include "PrimitiveComponent.h"
+#include "CoreUObject/UObject/Casts.h"
 
 REGISTER_CLASS(UPrimitiveComponent, USceneComponent)
 UPrimitiveComponent::UPrimitiveComponent()
@@ -96,4 +97,12 @@ bool UPrimitiveComponent::IntersectRayTriangle(const FVector& rayOrigin, const F
     }
 
     return false;
+}
+
+UObject* UPrimitiveComponent::Duplicate(UObject* Outer, UClass* ClassInfo)
+{
+    UPrimitiveComponent* NewComponent = Cast<UPrimitiveComponent>(Super::Duplicate(Outer, ClassInfo));
+    NewComponent->AABB = AABB;
+    NewComponent->m_Type = m_Type;
+    return NewComponent;
 }

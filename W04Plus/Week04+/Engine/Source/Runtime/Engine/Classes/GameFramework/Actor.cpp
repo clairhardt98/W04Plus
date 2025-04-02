@@ -145,6 +145,42 @@ bool AActor::SetActorScale(const FVector& NewScale)
     return false;
 }
 
+
+
+void AActor::DuplicateSiblings(UObject* Outer)
+{
+    // 여기선 ActorComponent들을 복사한다
+    // Caller => src Actor
+    // Outer => dst Actor
+
+    AActor* NewActor = Cast<AActor>(Outer);
+
+    for (UActorComponent* Comp : OwnedComponents)
+    {
+        FString ClassName = Comp->GetClass()->GetName();
+        UClass* ClassInfo = UClass::FindClass(ClassName);
+        if (!ClassInfo)
+            continue;
+
+        Comp->Duplicate(Outer, ClassInfo);
+
+        //Comp->bHasBeenInitialized = false;
+        //Comp->bHasBegunPlay = false;
+        //Comp->
+    }
+
+}
+
+UObject* AActor::Duplicate(UObject* Outer, UClass* ClassInfo)
+{
+    UWorld* NewWorld = Cast<UWorld>(Outer);
+    AActor* NewActor = NewWorld->SpawnActorByClass(ClassInfo, false);
+
+    DuplicateSiblings(NewActor);
+
+    return NewActor;
+}
+
 UActorComponent* AActor::AddComponentByClass(UClass* ComponentClass)
 {
     if (ComponentClass == nullptr)

@@ -81,6 +81,11 @@ public:
     UObject* GetWorldGizmo() const { return worldGizmo; }
     USceneComponent* GetPickingGizmo() const { return pickingGizmo; }
     void SetPickingGizmo(UObject* Object);
+    AActor* SpawnActorByClass(UClass* ActorClass, bool bCallBeginPlay);
+
+    // Duplicate
+    void DuplicateSiblings(UObject* Outer) override;
+    UObject* Duplicate(UObject* Outer, UClass* ClassInfo) override;
 };
 
 

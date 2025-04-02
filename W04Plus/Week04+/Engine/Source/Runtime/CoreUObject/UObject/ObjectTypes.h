@@ -43,3 +43,11 @@ enum EPrimitiveColor
 	GREEN_Y_ROT,
 	BLUE_Z_ROT
 };
+// test
+enum EWorldType
+{
+    Editor,
+    EditorPreview,
+    PIE,
+    Game,
+};

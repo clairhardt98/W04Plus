@@ -84,3 +84,18 @@ void UActorComponent::Deactivate()
     // TODO: Tick 멈추기
     bIsActive = false;
 }
+
+UObject* UActorComponent::Duplicate(UObject* Outer, UClass* ClassInfo)
+{
+    // Outer는 New Actor
+    AActor* NewActor = Cast<AActor>(Outer);
+    UActorComponent* NewComp = NewActor->AddComponentByClass(ClassInfo);
+
+    // DuplicateSibling을 하지 않고, 자기 자신의 값 복사
+    return NewComp;
+}
+
+void UActorComponent::DuplicateSiblings(UObject* Outer)
+{
+    // 아무것도안함
+}

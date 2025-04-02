@@ -18,6 +18,9 @@ public:
     );
     FBoundingBox AABB;
 
+public:
+    UObject* Duplicate(UObject* Outer, UClass* ClassInfo) override;
+
 private:
     FString m_Type;
 
