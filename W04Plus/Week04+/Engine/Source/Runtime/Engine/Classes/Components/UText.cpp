@@ -155,22 +155,35 @@ void UText::TextMVPRendering()
 
 FMatrix UText::CreateBillboardMatrix()
 {
+    // 1. 카메라의 View 행렬 가져오기
     FMatrix View = GetEngine().GetLevelEditor()->GetActiveViewportClient()->GetViewMatrix();
-    View.M[0][3] = View.M[1][3] = View.M[2][3] = 0.0f;
-    View.M[3][0] = View.M[3][1] = View.M[3][2] = 0.0f;
-    //View.M[0][2] = -View.M[0][2];
-   /* View.M[1][2] = -View.M[1][2];
-    View.M[2][2] = -View.M[2][2];*/
-    FMatrix billboard({
-        {0,-1,0,0},
-        {-1,0,0,0},
-        {0,0,-1,0},
-        {0,0,0,1},
+
+    // 2. 회전 부분만 추출 (이동 성분 제거)
+    View.M[3][0] = View.M[3][1] = View.M[3][2] = 0.0f;  // 이동 제거
+    View.M[0][3] = View.M[1][3] = View.M[2][3] = 0.0f;  // 투영 관련 성분 제거
+
+    // 3. View 행렬의 회전 부분만 역행렬 계산 (카메라 방향에 맞춤)
+    FMatrix ViewRotation = View;
+    ViewRotation.M[3][3] = 1.0f;  // 동차 좌표 보정
+    FMatrix InverseViewRotation = FMatrix::Inverse(ViewRotation);  // 회전만 역변환
+
+    // 4. 빌보드의 기본 방향 설정 (X: Right, Y: Up, Z: Forward)
+    FMatrix BillboardBase({
+    {0,0,1,0},
+    {-1,0,0,0},
+    {0,1,0,0},
+    {0,0,0,1},
         });
-    FMatrix LookAt = View * billboard;
+
+    // 5. 최종 빌보드 회전 = BillboardBase * InverseViewRotation
+    FMatrix BillboardRotation = BillboardBase * InverseViewRotation;
+
+    // 6. 스케일 및 위치 적용
     FMatrix Scale = FMatrix::CreateScale(RelativeScale3D.x, RelativeScale3D.y, RelativeScale3D.z);
-    FMatrix Trans = FMatrix::CreateTranslationMatrix(GetWorldLocation());
-    return Scale * LookAt * Trans;
+    FMatrix Translation = FMatrix::CreateTranslationMatrix(GetWorldLocation());
+
+    // 7. 최종 행렬: Scale -> Rotate -> Translate
+    return Scale * BillboardRotation * Translation;
 }
 
 FMatrix UText::CreateStandardModelMatrix()

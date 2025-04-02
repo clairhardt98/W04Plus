@@ -45,7 +45,7 @@ protected:
     const int quadSize = 2;
     float quadWidth = 2.0f;
     float quadHeight = 2.0f;
-    bool bBillboardMode = false;
+    bool bBillboardMode = true;
 
     void setStartUV(char alphabet, float& outStartU, float& outStartV);
     void setStartUV(wchar_t hangul, float& outStartU, float& outStartV);
