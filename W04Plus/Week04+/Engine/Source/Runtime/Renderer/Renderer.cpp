@@ -990,6 +990,10 @@ void FRenderer::PrepareRender()
         {
             LightObjs.Add(pLightComp);
         }
+        if (UText* TextComp = Cast<UText>(iter))
+        {
+            TextObjs.Add(TextComp);
+        }
     }
 }
 
@@ -1013,7 +1017,10 @@ void FRenderer::Render(UWorld* World, std::shared_ptr<FEditorViewportClient> Act
         RenderStaticMeshes(World, ActiveViewport);
     RenderGizmos(World, ActiveViewport);
     if (ActiveViewport->GetShowFlag() & static_cast<uint64>(EEngineShowFlags::SF_BillboardText))
+    {
         RenderBillboards(World, ActiveViewport);
+        RenderText(World, ActiveViewport);
+    }
     RenderLight(World, ActiveViewport);
     
     ClearRenderArr();
@@ -1158,13 +1165,6 @@ void FRenderer::RenderBillboards(UWorld* World, std::shared_ptr<FEditorViewportC
                 SubUVParticle->indexTextureBuffer, SubUVParticle->numIndices, SubUVParticle->Texture->TextureSRV, SubUVParticle->Texture->SamplerState
             );
         }
-        else if (UText* Text = Cast<UText>(BillboardComp))
-        {
-            FEngineLoop::renderer.RenderTextPrimitive(
-                Text->vertexTextBuffer, Text->numTextVertices,
-                Text->Texture->TextureSRV, Text->Texture->SamplerState
-            );
-        }
         else
         {
             RenderTexturePrimitive(
@@ -1173,6 +1173,22 @@ void FRenderer::RenderBillboards(UWorld* World, std::shared_ptr<FEditorViewportC
             );
         }
     }
+    PrepareShader();
+}
+
+void FRenderer::RenderText(UWorld* World, std::shared_ptr<FEditorViewportClient> ActiveViewport)
+{
+    PrepareTextureShader();
+    PrepareSubUVConstant();
+
+    for (UText* TextComp : TextObjs)
+    {
+        if (TextComp)
+        {
+            TextComp->TextMVPRendering();
+        }
+    }
+
     PrepareShader();
 }
 

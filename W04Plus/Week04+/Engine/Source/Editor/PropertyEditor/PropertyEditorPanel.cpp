@@ -180,6 +180,10 @@ void PropertyEditorPanel::Render()
                 ImGui::PushItemFlag(ImGuiItemFlags_NoNavDefaultFocus, true);
                 if (ImGui::InputText("##Text", buf, 256, ImGuiInputTextFlags_EnterReturnsTrue))
                 {
+                    size_t len = strlen(buf);
+                    while (len > 0 && (buf[len - 1] == '\n' || buf[len - 1] == '\r'))
+                        buf[--len] = '\0';
+
                     textOBj->ClearText();
                     int wlen = MultiByteToWideChar(CP_UTF8, 0, buf, -1, nullptr, 0);
                     FWString newWText(wlen, L'\0');

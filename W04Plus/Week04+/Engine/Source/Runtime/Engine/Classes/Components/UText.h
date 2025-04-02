@@ -1,9 +1,12 @@
 #pragma once
-#include "UBillboardComponent.h"
+// UText.h
+#pragma once
+#include "PrimitiveComponent.h"
+#include "UTexture.h"
 
-class UText : public UBillboardComponent
+class UText : public UPrimitiveComponent
 {
-    DECLARE_CLASS(UText, UBillboardComponent)
+    DECLARE_CLASS(UText, UPrimitiveComponent)
 
 public:
     UText();
@@ -11,31 +14,43 @@ public:
 
     virtual void InitializeComponent() override;
     virtual void TickComponent(float DeltaTime) override;
+    virtual int CheckRayIntersection(FVector& rayOrigin, FVector& rayDirection, float& pfNearHitDistance) override;
+
     void ClearText();
     void SetText(FWString _text);
     FWString GetText() { return text; }
     void SetRowColumnCount(int _cellsPerRow, int _cellsPerColumn);
-    virtual int CheckRayIntersection(FVector& rayOrigin, FVector& rayDirection, float& pfNearHitDistance) override;
 
-    ID3D11Buffer* vertexTextBuffer;
+    void SetTexture(FWString _fileName);
+    void SetBillboardMode(bool bEnable);
+    bool CheckPickingOnNDC(const TArray<FVector>& checkQuad, float& hitDistance);
+    void TextMVPRendering();
+
     TArray<FVertexTexture> vertexTextureArr;
-    UINT numTextVertices;
+
+    std::shared_ptr<FTexture> Texture;
+
+    ID3D11Buffer* vertexTextBuffer = nullptr;
+    UINT numTextVertices = 0;
+
 protected:
     FWString text;
-
     TArray<FVector> quad;
 
+
+    int RowCount = 0;
+    int ColumnCount = 0;
+
     const int quadSize = 2;
-
-    int RowCount;
-    int ColumnCount;
-
     float quadWidth = 2.0f;
     float quadHeight = 2.0f;
+    bool bBillboardMode = false;
 
     void setStartUV(char alphabet, float& outStartU, float& outStartV);
     void setStartUV(wchar_t hangul, float& outStartU, float& outStartV);
     void CreateTextTextureVertexBuffer(const TArray<FVertexTexture>& _vertex, UINT byteWidth);
 
-    void TextMVPRendering();
+private:
+    FMatrix CreateBillboardMatrix();
+    FMatrix CreateStandardModelMatrix();
 };
