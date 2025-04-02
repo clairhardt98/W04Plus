@@ -10,6 +10,7 @@ UParticleSubUVComp::UParticleSubUVComp()
 {
     SetType(StaticClass()->GetName());
     bIsLoop = true;
+    bCanEverTick = true;
 }
 
 UParticleSubUVComp::~UParticleSubUVComp()

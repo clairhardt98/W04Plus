@@ -38,7 +38,7 @@ public:
 
 public:
     /** 이 컴포넌트를 소유하고 있는 Actor를 반환합니다. */
-    AActor* GetOwner() const { return Owner; }
+ AActor* GetOwner() const { return Owner; }
 
     /** 이 컴포넌트를 제거합니다. */
     virtual void DestroyComponent();
@@ -73,6 +73,7 @@ private:
     /** Component가 현재 활성화 중인지 여부 */
     uint8 bIsActive : 1;
 
+protected:
     /** Component의 Tick을 활성화할지 여부*/
     uint8 bCanEverTick : 1;
 

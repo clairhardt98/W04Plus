@@ -1041,7 +1041,7 @@ void FRenderer::RenderStaticMeshes(UWorld* World, std::shared_ptr<FEditorViewpor
         // 노말 회전시 필요 행렬
         FMatrix NormalMatrix = FMatrix::Transpose(FMatrix::Inverse(Model));
         FVector4 UUIDColor = StaticMeshComp->EncodeUUID() / 255.0f;
-        if (World->GetSelectedActor() == StaticMeshComp->GetOwner())
+        if (World->GetSelectedComponent() && World->GetSelectedComponent()->GetOwner() == StaticMeshComp->GetOwner())
         {
             UpdateConstant(MVP, NormalMatrix, UUIDColor, true);
         }
@@ -1078,7 +1078,7 @@ void FRenderer::RenderStaticMeshes(UWorld* World, std::shared_ptr<FEditorViewpor
 
 void FRenderer::RenderGizmos(const UWorld* World, const std::shared_ptr<FEditorViewportClient>& ActiveViewport)
 {
-    if (!World->GetSelectedActor())
+    if (!World->GetSelectedComponent())
     {
         return;
     }

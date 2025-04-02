@@ -1,6 +1,7 @@
 #include "Actor.h"
 
 #include "World.h"
+#include <Components/UParticleSubUVComp.h>
 
 REGISTER_CLASS(AActor, UObject)
 void AActor::BeginPlay()
@@ -20,6 +21,10 @@ void AActor::Tick(float DeltaTime)
     //const auto CopyComponents = OwnedComponents;
     for (UActorComponent* Comp : OwnedComponents)
     {
+        if (Comp->IsA<UParticleSubUVComp>())
+        {
+            int i = 1;
+        }
         if (Comp && Comp->bIsComponentTickEnabled())
         {
             Comp->TickComponent(DeltaTime);

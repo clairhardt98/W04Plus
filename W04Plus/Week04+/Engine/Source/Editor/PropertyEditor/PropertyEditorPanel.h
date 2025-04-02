@@ -3,6 +3,7 @@
 #include "UnrealEd/EditorPanel.h"
 
 class UStaticMeshComponent;
+class UBillboardComponent;
 
 class PropertyEditorPanel : public UEditorPanel
 {
@@ -22,6 +23,8 @@ private:
     void RenderForMaterial(UStaticMeshComponent* StaticMeshComp);
     void RenderMaterialView(UMaterial* Material);
     void RenderCreateMaterialView();
+
+    void RenderForBillboard(UBillboardComponent* BillboardComp);
 private:
     float Width = 0, Height = 0;
     FVector Location = FVector(0, 0, 0);
