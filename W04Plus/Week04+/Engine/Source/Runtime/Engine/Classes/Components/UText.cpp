@@ -7,7 +7,7 @@
 #include "Math/MathUtility.h"
 #include "Math/JungleMath.h"
 
-REGISTER_CLASS(UText, UBillboardComponent)
+REGISTER_CLASS(UText, UPrimitiveComponent)
 
 UText::UText()
 {
