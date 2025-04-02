@@ -5,7 +5,7 @@
 #include "UObject/ObjectFactory.h"
 #include "UnrealEd/PrimitiveBatch.h"
 
-
+REGISTER_CLASS(UStaticMeshComponent, UMeshComponent)
 uint32 UStaticMeshComponent::GetNumMaterials() const
 {
     if (staticMesh == nullptr) return 0;

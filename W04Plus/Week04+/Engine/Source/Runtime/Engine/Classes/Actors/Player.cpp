@@ -1,4 +1,4 @@
-﻿#include "Player.h"
+#include "Player.h"
 
 #include "UnrealClient.h"
 #include "World.h"
@@ -15,6 +15,7 @@
 #include "UnrealEd/EditorViewportClient.h"
 #include "UObject/UObjectIterator.h"
 
+REGISTER_CLASS(AEditorPlayer, AActor)
 
 using namespace DirectX;
 

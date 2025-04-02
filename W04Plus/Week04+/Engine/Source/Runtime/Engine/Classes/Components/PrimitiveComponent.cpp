@@ -1,5 +1,6 @@
 #include "PrimitiveComponent.h"
 
+REGISTER_CLASS(UPrimitiveComponent, USceneComponent)
 UPrimitiveComponent::UPrimitiveComponent()
 {
 }

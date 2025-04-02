@@ -4,6 +4,8 @@
 #include "UnrealEd/EditorViewportClient.h"
 #include "LevelEditor/SLevelEditor.h"
 
+REGISTER_CLASS(UCameraComponent, USceneComponent)
+
 UCameraComponent::UCameraComponent()
 {
 }

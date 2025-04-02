@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "Components/SceneComponent.h"
 #include "Container/Set.h"
 #include "Engine/EngineTypes.h"
@@ -86,6 +86,11 @@ public:
     bool SetActorRotation(const FVector& NewRotation);
     bool SetActorScale(const FVector& NewScale);
 
+    bool IsActorTickEnabled() const { return bCanEverTick; }
+
+public:
+    UActorComponent* AddComponentByClass(UClass* ComponentClass);
+
 protected:
     USceneComponent* RootComponent = nullptr;
 
@@ -99,6 +104,9 @@ private:
 
     /** 현재 Actor가 삭제 처리중인지 여부 */
     uint8 bActorIsBeingDestroyed : 1;
+
+    /** 현재 Actor가 Tick이 활성화 되어있는지 여부*/
+    uint8 bCanEverTick : 1;
 
 #if 1 // TODO: WITH_EDITOR 추가
 public:
@@ -156,3 +164,4 @@ T* AActor::GetComponentByClass()
     }
     return nullptr;
 }
+

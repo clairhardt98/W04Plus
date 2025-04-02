@@ -5,6 +5,7 @@
 #include "LevelEditor/SLevelEditor.h"
 #include "UnrealEd/EditorViewportClient.h"
 
+REGISTER_CLASS(UGizmoBaseComponent, UStaticMeshComponent)
 
 int UGizmoBaseComponent::CheckRayIntersection(FVector& rayOrigin, FVector& rayDirection, float& pfNearHitDistance)
 {
