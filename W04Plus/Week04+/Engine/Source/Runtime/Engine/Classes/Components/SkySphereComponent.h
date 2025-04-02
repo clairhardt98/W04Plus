@@ -16,4 +16,5 @@ public:
     float UOffset = 0;
     float VOffset = 0;
 
+    UObject* Duplicate(UObject* Outer, UClass* ClassInfo) override;
 };

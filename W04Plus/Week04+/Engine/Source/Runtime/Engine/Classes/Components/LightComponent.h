@@ -22,6 +22,7 @@ public:
     float GetRadius() const;
     void SetRadius(float r);
 
+    UObject* Duplicate(UObject* Outer, UClass* ClassInfo) override;
 private:
     FVector4 color;
     float radius;

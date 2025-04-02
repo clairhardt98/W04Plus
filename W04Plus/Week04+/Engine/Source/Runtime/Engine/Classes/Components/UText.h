@@ -35,6 +35,10 @@ public:
     ID3D11Buffer* vertexTextBuffer = nullptr;
     UINT numTextVertices = 0;
     bool GetBillboardMode() const { return bBillboardMode; }
+
+
+    UObject* Duplicate(UObject* Outer, UClass* ClassInfo) override;
+
 protected:
     FWString text;
     TArray<FVector> quad;
@@ -43,7 +47,7 @@ protected:
     int RowCount = 0;
     int ColumnCount = 0;
 
-    const int quadSize = 2;
+    int quadSize = 2;
     float quadWidth = 2.0f;
     float quadHeight = 2.0f;
     bool bBillboardMode = true;

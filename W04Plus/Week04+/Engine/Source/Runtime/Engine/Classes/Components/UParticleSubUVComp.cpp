@@ -3,6 +3,7 @@
 #include "UnrealEd/EditorViewportClient.h"
 #include "World.h"
 #include "LevelEditor/SLevelEditor.h"
+#include "UObject/Casts.h"
 
 REGISTER_CLASS(UParticleSubUVComp, UBillboardComponent)
 
@@ -115,4 +116,18 @@ void UParticleSubUVComp::CreateSubUVVertexBuffer()
 
 	vertexSubUVBuffer = FEngineLoop::renderer.CreateVertexBuffer(vertices.GetData(), static_cast<UINT>(vertices.Num() * sizeof(FVertexTexture)));
 	numTextVertices = static_cast<UINT>(vertices.Num());
+}
+
+UObject* UParticleSubUVComp::Duplicate(UObject* Outer, UClass* ClassInfo)
+{
+    UParticleSubUVComp* NewComponent = Cast<UParticleSubUVComp>(Super::Duplicate(Outer, ClassInfo));
+    NewComponent->vertexSubUVBuffer = vertexSubUVBuffer;
+    NewComponent->numTextVertices = numTextVertices;
+    NewComponent->bIsLoop = bIsLoop;
+    NewComponent->indexU = indexU;
+    NewComponent->indexV = indexV;
+    NewComponent->second = second;
+    NewComponent->CellsPerRow = CellsPerRow;
+    NewComponent->CellsPerColumn = CellsPerColumn;
+    return NewComponent;
 }

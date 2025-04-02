@@ -18,6 +18,7 @@ public:
 
     void SetData(OBJ::FStaticMeshRenderData* renderData);
 
+    UObject* Duplicate(UObject* Outer, UClass* ClassInfo) override;
 private:
     OBJ::FStaticMeshRenderData* staticMeshRenderData = nullptr;
     TArray<FStaticMaterial*> materials;

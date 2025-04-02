@@ -5,6 +5,7 @@
 #include "UnrealEd/EditorViewportClient.h"
 #include "LevelEditor/SLevelEditor.h"
 #include "UnrealEd/PrimitiveBatch.h"
+#include "UObject/Casts.h"
 
 REGISTER_CLASS(USphereComp, UStaticMeshComponent)
 USphereComp::USphereComp()
@@ -26,4 +27,10 @@ void USphereComp::InitializeComponent()
 void USphereComp::TickComponent(float DeltaTime)
 {
     Super::TickComponent(DeltaTime);
+}
+
+UObject* USphereComp::Duplicate(UObject* Outer, UClass* ClassInfo)
+{
+    USphereComp* NewComponent = Cast<USphereComp>(Super::Duplicate(Outer, ClassInfo));
+    return NewComponent;
 }

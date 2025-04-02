@@ -6,6 +6,7 @@
 #include "LevelEditor/SLevelEditor.h"
 #include "Math/MathUtility.h"
 #include "Math/JungleMath.h"
+#include "UObject/Casts.h"
 
 REGISTER_CLASS(UText, UPrimitiveComponent)
 
@@ -177,6 +178,39 @@ FMatrix UText::CreateBillboardMatrix()
 FMatrix UText::CreateStandardModelMatrix()
 {
     return JungleMath::CreateModelMatrix(GetWorldLocation(), GetWorldRotation(), GetWorldScale());
+}
+
+UObject* UText::Duplicate(UObject* Outer, UClass* ClassInfo)
+{
+
+    TArray<FVertexTexture> vertexTextureArr;
+    std::shared_ptr<FTexture> Texture;
+    ID3D11Buffer* vertexTextBuffer = nullptr;
+    UINT numTextVertices = 0;
+    FWString text;
+    TArray<FVector> quad;
+    int RowCount = 0;
+    int ColumnCount = 0;
+    int quadSize = 2;
+    float quadWidth = 2.0f;
+    float quadHeight = 2.0f;
+    bool bBillboardMode = true;
+
+    UText* NewComponent = Cast<UText>(Super::Duplicate(Outer, ClassInfo));
+    NewComponent->vertexTextureArr = vertexTextureArr;
+    NewComponent->Texture = Texture;
+    NewComponent->vertexTextBuffer = vertexTextBuffer;
+    NewComponent->numTextVertices = numTextVertices;
+    NewComponent->text = text;
+    NewComponent->quad = quad;
+    NewComponent->RowCount = RowCount;
+    NewComponent->ColumnCount = ColumnCount;
+    NewComponent->quadSize = quadSize;
+    NewComponent->quadWidth = quadWidth;
+    NewComponent->quadHeight = quadHeight;
+    NewComponent->bBillboardMode = bBillboardMode;
+
+    return NewComponent;
 }
 
 void UText::SetTexture(FWString _fileName)

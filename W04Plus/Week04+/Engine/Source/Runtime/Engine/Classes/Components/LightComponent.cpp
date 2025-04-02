@@ -46,6 +46,18 @@ void ULightComponentBase::SetRadius(float r)
     radius = r;
 }
 
+UObject* ULightComponentBase::Duplicate(UObject* Outer, UClass* ClassInfo)
+{
+    ULightComponentBase* NewComponent = Cast<ULightComponentBase>(Super::Duplicate(Outer, ClassInfo));
+    NewComponent->color = color;
+    NewComponent->radius = radius;
+    NewComponent->AABB = AABB;
+    // test
+    NewComponent->texture2D = texture2D;
+
+    return NewComponent;
+}
+
 void ULightComponentBase::InitializeLight()
 {
     texture2D = GetOwner()->AddComponent<UBillboardComponent>();

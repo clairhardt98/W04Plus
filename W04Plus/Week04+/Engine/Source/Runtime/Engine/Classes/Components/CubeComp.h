@@ -9,6 +9,8 @@ public:
     UCubeComp();
     virtual ~UCubeComp() override;
 
+    UObject* Duplicate(UObject* Outer, UClass* ClassInfo) override;
+
     virtual void InitializeComponent() override;
     virtual void TickComponent(float DeltaTime) override;
 };

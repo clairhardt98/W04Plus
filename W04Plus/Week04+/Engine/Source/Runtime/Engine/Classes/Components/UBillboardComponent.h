@@ -21,6 +21,8 @@ public:
     void SetUUIDParent(USceneComponent* _parent);
     FMatrix CreateBillboardMatrix();
 
+    UObject* Duplicate(UObject* Outer, UClass* ClassInfo) override;
+
     ID3D11Buffer* vertexTextureBuffer;
     ID3D11Buffer* indexTextureBuffer;
     UINT numVertices;

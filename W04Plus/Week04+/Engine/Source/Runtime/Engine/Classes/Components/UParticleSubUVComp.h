@@ -30,4 +30,6 @@ private:
 
     void UpdateVertexBuffer(const TArray<FVertexTexture>& vertices);
     void CreateSubUVVertexBuffer();
+
+    UObject* Duplicate(UObject* Outer, UClass* ClassInfo) override;
 };

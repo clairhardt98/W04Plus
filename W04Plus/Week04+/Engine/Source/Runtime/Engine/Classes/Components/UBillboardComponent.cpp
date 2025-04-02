@@ -107,6 +107,25 @@ FMatrix UBillboardComponent::CreateBillboardMatrix()
 	return M;
 }
 
+UObject* UBillboardComponent::Duplicate(UObject* Outer, UClass* ClassInfo)
+{
+    UBillboardComponent* NewComponent = Cast<UBillboardComponent>(Super::Duplicate(Outer, ClassInfo));
+    NewComponent->numVertices = numVertices;
+    NewComponent->numIndices = numIndices;
+    NewComponent->finalIndexU = finalIndexU;
+    NewComponent->finalIndexU = finalIndexU;
+    NewComponent->Texture = Texture;
+    NewComponent->vertexTextureBuffer = vertexTextureBuffer;
+    NewComponent->indexTextureBuffer = indexTextureBuffer;
+    NewComponent->TextureID = TextureID;
+
+    AActor* NewParent = Cast<AActor>(Outer);
+    // test
+    NewComponent->m_parent = NewParent->GetRootComponent();
+
+    return NewComponent;
+}
+
 void UBillboardComponent::CreateQuadTextureVertexBuffer()
 {
 	numVertices = sizeof(quadTextureVertices) / sizeof(FVertexTexture);

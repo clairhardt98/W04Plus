@@ -1,6 +1,7 @@
 #include "StaticMesh.h"
 #include "Engine/FLoaderOBJ.h"
 #include "UObject/ObjectFactory.h"
+#include "UObject/Casts.h"
 
 REGISTER_CLASS(UStaticMesh, UObject)
 
@@ -63,4 +64,13 @@ void UStaticMesh::SetData(OBJ::FStaticMeshRenderData* renderData)
 
         materials.Add(newMaterialSlot);
     }
+}
+
+UObject* UStaticMesh::Duplicate(UObject* Outer, UClass* ClassInfo)
+{
+    UStaticMesh* NewComponent = Cast<UStaticMesh>(Super::Duplicate(Outer, ClassInfo));
+    // test
+    NewComponent->staticMeshRenderData = staticMeshRenderData;
+    NewComponent->materials = materials;
+    return NewComponent;
 }
