@@ -142,7 +142,7 @@ void UText::SetText(FWString _text)
 void UText::TextMVPRendering()
 {
     FEngineLoop::renderer.PrepareTextureShader();
-
+    FEngineLoop::renderer.UpdateSubUVConstant(0, 0);
     FMatrix Model = bBillboardMode ? CreateBillboardMatrix() : CreateStandardModelMatrix();
     FMatrix View = GetEngine().GetLevelEditor()->GetActiveViewportClient()->GetViewMatrix();
     FMatrix Proj = GetEngine().GetLevelEditor()->GetActiveViewportClient()->GetProjectionMatrix();
