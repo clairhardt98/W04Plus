@@ -1041,7 +1041,7 @@ void FRenderer::RenderStaticMeshes(UWorld* World, std::shared_ptr<FEditorViewpor
         // 노말 회전시 필요 행렬
         FMatrix NormalMatrix = FMatrix::Transpose(FMatrix::Inverse(Model));
         FVector4 UUIDColor = StaticMeshComp->EncodeUUID() / 255.0f;
-        if (World->GetSelectedComponent() && World->GetSelectedComponent()->GetOwner() == StaticMeshComp->GetOwner())
+        if (World->GetSelectedComponent() == StaticMeshComp)
         {
             UpdateConstant(MVP, NormalMatrix, UUIDColor, true);
         }
@@ -1195,7 +1195,7 @@ void FRenderer::RenderText(UWorld* World, std::shared_ptr<FEditorViewportClient>
             FMatrix NormalMatrix = FMatrix::Transpose(FMatrix::Inverse(Model));
 
             FVector4 UUIDColor = TextComp-> EncodeUUID() / 255.0f;
-            bool bSelected = (World ->GetSelectedActor() == TextComp->GetOwner());
+            bool bSelected = (World -> GetSelectedComponent() == TextComp);
 
             FEngineLoop::renderer.UpdateConstant(MVP, NormalMatrix, UUIDColor, bSelected);
             FEngineLoop::renderer.RenderTextPrimitive(TextComp->vertexTextBuffer, TextComp->numTextVertices, TextComp->Texture->TextureSRV, TextComp->Texture->SamplerState);
