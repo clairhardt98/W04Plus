@@ -117,17 +117,23 @@ void AEditorPlayer::Input()
         }
     }
 
+  
     if (GetAsyncKeyState(VK_DELETE) & 0x8000)
     {
         UWorld* World = GetWorld();
         USceneComponent* SelectedComponent = World->GetSelectedComponent();
-        if (!SelectedComponent)
-            return;
-
-        if (AActor* PickedActor = World->GetSelectedComponent()->GetOwner())
+        if (SelectedComponent)
         {
-            World->DestroyActor(PickedActor);
-            World->SetPickedComponent(nullptr);
+            if (SelectedComponent == SelectedComponent->GetOwner()->GetRootComponent())
+            {
+                World->DestroyActor(SelectedComponent->GetOwner());
+                World->SetPickedComponent(nullptr);
+            }
+            else {
+                SelectedComponent->GetOwner()->RemoveOwnedComponent(SelectedComponent);
+                SelectedComponent->DestroyComponent();
+                World->SetPickedComponent(nullptr);
+            }
         }
     }
 }
