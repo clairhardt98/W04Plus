@@ -22,6 +22,7 @@ void UWorld::Initialize()
     USkySphereComponent* skySphere = SpawnedActor->AddComponent<USkySphereComponent>();
     skySphere->SetStaticMesh(FManagerOBJ::GetStaticMesh(L"SkySphere.obj"));
     skySphere->GetStaticMesh()->GetMaterials()[0]->Material->SetDiffuse(FVector((float)32/255, (float)171/255, (float)191/255));
+
 }
 
 void UWorld::CreateBaseObject()
@@ -178,6 +179,7 @@ void UWorld::DuplicateProperties(UObject* NewObject, const FObjectDuplicationPar
                 Params.DuplicationMap ? Params.DuplicationMap : nullptr
             );
 
+            //
             AActor* DuplicatedActor = Cast<AActor>(Actor->DuplicateObject(ActorParams));
             if (DuplicatedActor)
             {

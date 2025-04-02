@@ -21,6 +21,9 @@ public:
     void AddRotation(FVector _added);
     void AddScale(FVector _added);
 
+    virtual UObject* DuplicateObject(const FObjectDuplicationParameters& Params) const override;
+    virtual void DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const override;
+
 protected:
     FVector RelativeLocation;
     FVector RelativeRotation;

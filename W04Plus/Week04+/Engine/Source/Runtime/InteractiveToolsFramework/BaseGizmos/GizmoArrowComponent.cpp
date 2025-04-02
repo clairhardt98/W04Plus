@@ -26,6 +26,27 @@ void UGizmoArrowComponent::TickComponent(float DeltaTime)
 
 }
 
+UObject* UGizmoArrowComponent::DuplicateObject(const FObjectDuplicationParameters& Params) const
+{
+    UObject* NewObject = Super::DuplicateObject(Params);
+
+    DuplicateProperties(NewObject, Params);
+    return NewObject;
+}
+
+void UGizmoArrowComponent::DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const
+{
+    Super::DuplicateProperties(NewObject, Params);
+
+    UGizmoArrowComponent* NewComponent = static_cast<UGizmoArrowComponent*>(NewObject);
+    if (!NewComponent)
+    {
+        UE_LOG(LogLevel::Error, "DuplicateProperties: NewObject is not UGizmoArrowComponent");
+        return;
+    }
+    NewComponent->Dir = this->Dir;
+}
+
 // void UGizmoArrowComponent::Render()
 // {
 // #pragma region GizmoDepth

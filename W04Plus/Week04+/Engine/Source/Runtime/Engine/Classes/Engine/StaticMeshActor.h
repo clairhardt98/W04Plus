@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "GameFramework/Actor.h"
 
 
@@ -10,6 +10,9 @@ public:
     AStaticMeshActor();
 
     UStaticMeshComponent* GetStaticMeshComponent() const { return StaticMeshComponent; }
+
+    virtual UObject* DuplicateObject(const FObjectDuplicationParameters& Params) const override;
+    virtual void DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const override;
 
 private:
     UStaticMeshComponent* StaticMeshComponent = nullptr;

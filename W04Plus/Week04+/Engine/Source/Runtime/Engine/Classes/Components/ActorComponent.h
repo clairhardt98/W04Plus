@@ -43,17 +43,22 @@ public:
     /** 이 컴포넌트를 소유하고 있는 Actor를 반환합니다. */
     AActor* GetOwner() const { return Owner; }
 
+    void SetOwner(AActor* InOwner) { Owner = InOwner; }
+
     /** 이 컴포넌트를 제거합니다. */
     virtual void DestroyComponent();
 
     /** Component의 BeginPlay가 호출 되었는지 여부를 반환합니다. */
     bool HasBegunPlay() const { return bHasBegunPlay; }
 
+    void SetHasBegunPlay(uint8 InbHasBegunPlay) { bHasBegunPlay = InbHasBegunPlay; }
+
     /** Component가 초기화 되었는지 여부를 반환합니다. */
     bool HasBeenInitialized() const { return bHasBeenInitialized; }
 
     /** Component가 현재 활성화 중인지 여부를 반환합니다. */
     bool IsActive() const { return bIsActive; }
+
 
     void Activate();
     void Deactivate();

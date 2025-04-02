@@ -96,3 +96,35 @@ bool UPrimitiveComponent::IntersectRayTriangle(const FVector& rayOrigin, const F
 
     return false;
 }
+
+UObject* UPrimitiveComponent::DuplicateObject(const FObjectDuplicationParameters& Params) const
+{
+    UObject* NewObject = Super::DuplicateObject(Params);
+
+    DuplicateProperties(NewObject, Params);
+    return NewObject;
+}
+
+void UPrimitiveComponent::DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const
+{
+    Super::DuplicateProperties(NewObject, Params);
+
+    UPrimitiveComponent* NewComponent = static_cast<UPrimitiveComponent*>(NewObject);
+    if (!NewComponent)
+    {
+        UE_LOG(LogLevel::Error, "DuplicateProperties: NewObject is not UPrimitiveComponent");
+        return;
+    }
+
+    // 이렇게 하는게 아닌가
+    UE_LOG(LogLevel::Display, "Before copying, m_Type = %s", m_Type.ToWideString());
+
+    // 문자열 대입 전에 NewPrim->m_Type가 올바르게 초기화되었는지
+    if (m_Type != "")
+    {
+        NewComponent->m_Type = this->m_Type;
+    }
+
+    //UE_LOG(LogLevel::Display, "After copying, NewPrim->m_Type = %s", NewComponent->m_Type.ToWideString());
+
+}

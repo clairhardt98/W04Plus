@@ -97,7 +97,7 @@ public:
     UClass* GetClass() const { return ClassPrivate; }
 
     virtual UObject* DuplicateObject(const FObjectDuplicationParameters& Params) const;
-    virtual void DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const {}
+    virtual void DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const;
 
     /** this가 SomeBase인지, SomeBase의 자식 클래스인지 확인합니다. */
     bool IsA(const UClass* SomeBase) const;

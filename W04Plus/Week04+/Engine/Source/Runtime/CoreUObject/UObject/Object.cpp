@@ -38,8 +38,10 @@ UObject* UObject::DuplicateObject(const FObjectDuplicationParameters& Params) co
     if (Params.DuplicationMap && Params.DuplicationMap->find(this) != Params.DuplicationMap->end()) return (*Params.DuplicationMap)[this];
 
     FName NewName = (Params.NewName != NAME_None) ? Params.NewName : this->NamePrivate;
-    UObject* NewObject = FObjectFactory::ConstructObjectFromClass<UObject>(GetClass(), Outer, NewName);
 
+    // test error
+    //UObject* NewObject = FObjectFactory::ConstructObject<UObject>();
+    UObject* NewObject = FObjectFactory::ConstructObjectFromClass<UObject>(GetClass(), Outer, NewName);
     // DuplicationMap이 있다면 현재 객체와 새 객체를 등록하여 순환 참조 방지
     if (Params.DuplicationMap)
     {
@@ -63,6 +65,11 @@ UObject* UObject::DuplicateObject(const FObjectDuplicationParameters& Params) co
 
     return NewObject;
 }
+
+void UObject::DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const
+{
+}
+
 bool UObject::IsA(const UClass* SomeBase) const
 {
     const UClass* ThisClass = GetClass();

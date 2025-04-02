@@ -117,3 +117,33 @@ void UCameraComponent::RotatePitch(float _Value)
 	if (RelativeRotation.y > 90.0f)
 		RelativeRotation.y = 90.0f;
 }
+
+UObject* UCameraComponent::DuplicateObject(const FObjectDuplicationParameters& Params) const
+{
+    UObject* NewObject = Super::DuplicateObject(Params);
+
+    DuplicateProperties(NewObject, Params);
+    return NewObject;
+}
+
+void UCameraComponent::DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const
+{
+    Super::DuplicateProperties(NewObject, Params);
+
+    UCameraComponent* NewComponent = static_cast<UCameraComponent*>(NewObject);
+    if (!NewComponent)
+    {
+        UE_LOG(LogLevel::Error, "DuplicateProperties: NewObject is not UPrimitiveComponent");
+        return;
+    }
+
+    NewComponent->mouseSpeed = this->mouseSpeed;
+    NewComponent->lastMousePos = this->lastMousePos;
+    NewComponent->bRightMouseDown = this->bRightMouseDown;
+    NewComponent->zAxis = this->zAxis;
+    NewComponent->xAxis = this->xAxis;
+    NewComponent->yAxis = this->yAxis;
+    NewComponent->FOV = this->FOV;
+    NewComponent->nearClip = this->nearClip;
+    NewComponent->farClip = this->farClip;
+}

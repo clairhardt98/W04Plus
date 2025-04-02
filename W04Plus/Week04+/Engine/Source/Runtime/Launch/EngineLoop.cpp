@@ -192,6 +192,7 @@ void FEngineLoop::Tick()
         }
 
         Input();
+        // 이것도 바꾸긴 해야함.
         GWorld->Tick(elapsedTime);
         LevelEditor->Tick(elapsedTime);
         Render();
@@ -241,6 +242,54 @@ void FEngineLoop::Input()
     else
     {
         bTestInput = false;
+    }
+}
+
+// 여기에 FObjectDuplicationParameters 이거 안가져왔던 것 같은데 흠
+void FEngineLoop::StartPlayInEditor()
+{
+    OriginalWorld = GWorld;
+
+    // 순환 참조 문제를 방지하기 위한 복제 매핑 테이블 생성
+    std::unordered_map<const UObject*, UObject*> DuplicationMap;
+    FObjectDuplicationParameters Params(
+        GWorld,                                  // 원본 World
+        FObjectFactory::GetTransientPackage(),   // Outer: Transient Package 사용
+        FName("PIE_World"),                      // 새 World 이름
+        0,                                       // 필요한 복제 플래그 (필요에 따라 설정)
+        true,                                    // 깊은 복사 수행
+        &DuplicationMap                          // DuplicationMap 전달
+    );
+    //
+    UWorld* PIEWorld = static_cast<UWorld*>(GWorld->DuplicateObject(Params));
+    if (PIEWorld)
+    {
+        UE_LOG(LogLevel::Display, "World duplicated for PIE mode.");
+        GWorld = PIEWorld;
+    }
+    else
+    {
+        UE_LOG(LogLevel::Error, "Failed to duplicate World for PIE mode.");
+    }
+}
+
+void FEngineLoop::StopPlayInEditor()
+{
+    if (OriginalWorld)
+    {
+        if (GWorld && GWorld != OriginalWorld)
+        {
+            GWorld->Release();
+            delete GWorld;
+        }
+
+        GWorld = OriginalWorld;
+        OriginalWorld = nullptr;
+        UE_LOG(LogLevel::Display, "PIE stopped. Restored original world.");
+    }
+    else
+    {
+        UE_LOG(LogLevel::Warning, "StopPIE: OriginalWorld is null; PIE might not have been started.");
     }
 }
 

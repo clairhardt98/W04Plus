@@ -62,3 +62,37 @@ void UStaticMesh::SetData(OBJ::FStaticMeshRenderData* renderData)
         materials.Add(newMaterialSlot);
     }
 }
+
+UObject* UStaticMesh::DuplicateObject(const FObjectDuplicationParameters& Params) const
+{
+    UObject* NewObject = Super::DuplicateObject(Params);
+
+    DuplicateProperties(NewObject, Params);
+    return NewObject;
+}
+
+void UStaticMesh::DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const
+{
+    Super::DuplicateProperties(NewObject, Params);
+
+    UStaticMesh* NewStaticMesh = static_cast<UStaticMesh*>(NewObject);
+    if (!NewStaticMesh)
+    {
+        UE_LOG(LogLevel::Error, "DuplicateProperties: NewObject is not UStaticMesh");
+        return;
+    }
+
+    if (Params.bDeepCopy && staticMeshRenderData)
+    {
+        OBJ::FStaticMeshRenderData* NewRenderData = new OBJ::FStaticMeshRenderData(*staticMeshRenderData);
+        NewStaticMesh->staticMeshRenderData = NewRenderData;
+    }
+    else
+    {
+        // 얕은 복사의 경우 포인터만 복사합니다.
+        NewStaticMesh->staticMeshRenderData = staticMeshRenderData;
+    }
+
+    // materials는 보통 공유 자원이므로 얕은 복사로 충분합니다.
+    NewStaticMesh->materials = materials;
+}

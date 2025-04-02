@@ -16,4 +16,6 @@ public:
     float UOffset = 0;
     float VOffset = 0;
 
+    virtual UObject* DuplicateObject(const FObjectDuplicationParameters& Params) const override;
+    virtual void DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const override;
 };

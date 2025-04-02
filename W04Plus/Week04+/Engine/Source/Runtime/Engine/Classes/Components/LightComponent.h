@@ -19,6 +19,9 @@ public:
     float GetRadius() const;
     void SetRadius(float r);
 
+    virtual UObject* DuplicateObject(const FObjectDuplicationParameters& Params) const override;
+    virtual void DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const override;
+
 private:
     FVector4 color;
     float radius;

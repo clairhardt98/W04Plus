@@ -26,3 +26,24 @@ bool UGizmoCircleComponent::IntersectsRay(const FVector& rayOrigin, const FVecto
 
     return (inner * inner < intersectionToDiscCenterSquared && intersectionToDiscCenterSquared < 1);
 }
+
+UObject* UGizmoCircleComponent::DuplicateObject(const FObjectDuplicationParameters& Params) const
+{
+    UObject* NewObject = Super::DuplicateObject(Params);
+
+    DuplicateProperties(NewObject, Params);
+    return NewObject;
+}
+
+void UGizmoCircleComponent::DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const
+{
+    Super::DuplicateProperties(NewObject, Params);
+
+    UGizmoCircleComponent* NewComponent = static_cast<UGizmoCircleComponent*>(NewObject);
+    if (!NewComponent)
+    {
+        UE_LOG(LogLevel::Error, "DuplicateProperties: NewObject is not UGizmoCircleComponent");
+        return;
+    }
+    NewComponent->inner = this->inner;
+}

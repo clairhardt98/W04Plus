@@ -24,3 +24,24 @@ void UGizmoRectangleComponent::TickComponent(float DeltaTime)
 {
     Super::TickComponent(DeltaTime);
 }
+
+UObject* UGizmoRectangleComponent::DuplicateObject(const FObjectDuplicationParameters& Params) const
+{
+    UObject* NewObject = Super::DuplicateObject(Params);
+
+    DuplicateProperties(NewObject, Params);
+    return NewObject;
+
+}
+
+void UGizmoRectangleComponent::DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const
+{
+    Super::DuplicateProperties(NewObject, Params);
+
+    UGizmoRectangleComponent* NewComponent = static_cast<UGizmoRectangleComponent*>(NewObject);
+    if (!NewComponent)
+    {
+        UE_LOG(LogLevel::Error, "DuplicateProperties: NewObject is not UGizmoRectangleComponent");
+        return;
+    }
+}

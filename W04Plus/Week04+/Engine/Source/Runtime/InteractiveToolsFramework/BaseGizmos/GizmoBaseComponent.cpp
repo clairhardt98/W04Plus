@@ -74,3 +74,25 @@ void UGizmoBaseComponent::TickComponent(float DeltaTime)
         }
     }
 }
+
+UObject* UGizmoBaseComponent::DuplicateObject(const FObjectDuplicationParameters& Params) const
+{
+    UObject* NewObject = Super::DuplicateObject(Params);
+
+    DuplicateProperties(NewObject, Params);
+    return NewObject;
+}
+
+void UGizmoBaseComponent::DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const
+{
+    Super::DuplicateProperties(NewObject, Params);
+
+    UGizmoBaseComponent* NewComponent = static_cast<UGizmoBaseComponent*>(NewObject);
+    if (!NewComponent)
+    {
+        UE_LOG(LogLevel::Error, "DuplicateProperties: NewObject is not UGizmoBaseComponent");
+        return;
+    }
+
+    NewComponent->gizmoType = this->gizmoType;
+}

@@ -34,6 +34,31 @@ void ULightComponentBase::SetRadius(float r)
     radius = r;
 }
 
+UObject* ULightComponentBase::DuplicateObject(const FObjectDuplicationParameters& Params) const
+{
+    UObject* NewObject = Super::DuplicateObject(Params);
+
+    DuplicateProperties(NewObject, Params);
+    return NewObject;
+}
+
+void ULightComponentBase::DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const
+{
+    Super::DuplicateProperties(NewObject, Params);
+
+    ULightComponentBase* NewComponent = static_cast<ULightComponentBase*>(NewObject);
+    if (!NewComponent)
+    {
+        UE_LOG(LogLevel::Error, "DuplicateProperties: NewObject is not ULightComponentBase");
+        return;
+    }
+
+    NewComponent->color = this->color;
+    NewComponent->radius = this->radius;
+    NewComponent->AABB = this->AABB;
+    NewComponent->texture2D = this->texture2D;
+}
+
 void ULightComponentBase::InitializeLight()
 {
     texture2D = new UBillboardComponent();

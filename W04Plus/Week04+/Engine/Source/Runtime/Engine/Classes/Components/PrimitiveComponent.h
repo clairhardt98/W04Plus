@@ -18,6 +18,11 @@ public:
     );
     FBoundingBox AABB;
 
+
+    virtual UObject* DuplicateObject(const FObjectDuplicationParameters& Params) const override;
+    virtual void DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const override;
+
+
 private:
     FString m_Type;
 

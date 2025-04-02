@@ -18,6 +18,9 @@ public:
 
     void SetData(OBJ::FStaticMeshRenderData* renderData);
 
+    virtual UObject* DuplicateObject(const FObjectDuplicationParameters& Params) const override;
+    virtual void DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const override;
+
 private:
     OBJ::FStaticMeshRenderData* staticMeshRenderData = nullptr;
     TArray<FStaticMaterial*> materials;

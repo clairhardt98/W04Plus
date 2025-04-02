@@ -18,6 +18,10 @@ public:
     virtual void SetMaterialByName(FName MaterialSlotName, class UMaterial* Material);
     virtual void GetUsedMaterials(TArray<UMaterial*>& Out) const;
 #pragma endregion
+
+    virtual UObject* DuplicateObject(const FObjectDuplicationParameters& Params) const override;
+    virtual void DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const override;
+
 protected:
     TArray<UMaterial*> OverrideMaterials;
 public:

@@ -69,6 +69,74 @@ void USceneComponent::AddScale(FVector _added)
 
 }
 
+UObject* USceneComponent::DuplicateObject(const FObjectDuplicationParameters& Params) const
+{
+    UObject* NewObject = Super::DuplicateObject(Params);
+    DuplicateProperties(NewObject, Params);
+    return NewObject;
+}
+
+void USceneComponent::DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const
+{
+    Super::DuplicateProperties(NewObject, Params);
+    USceneCompoonent* NewSceneComp = static_cast<USceneComponent*>(NewObject);
+    USceneComponent* TempComp = new USceneComponent();
+    TempComp->bHasBeenInitialized = NewObject->bHasBeenInitialized;
+    TempComp->bHasBegunPlay = NewObject->bHasBegunPlay;
+    TempComp->bIsBeingDestyed = NewObject->bIsBeingDestroyed;
+    TempComp->bIsActive = NewObject->bIsActive;
+    TempComp->bAutoActive = NewObject->bAutoActive;
+
+    TempComp->SetOwner(NewSceneComp->GetOwner());
+    TempComp->
+
+    if (!TempComp)
+    {
+        UE_LOG(LogLevel::Error, "DuplicateProperties: NewObject is not USceneComponent");
+        return;
+    }
+
+    // 트랜스폼 정보 복사 (값 형식이므로 단순 대입)
+    TempComp->RelativeLocation = NewObject->RelativeLocation;
+    TempComp->RelativeRotation = NewObject->RelativeRotation;
+    TempComp->QuatRotation = NewObject->QuatRotation;
+    TempComp->RelativeScale3D = NewObject->RelativeScale3D;
+
+    // AttachParent는 보통 복제 과정에서 외부에서 재설정하도록 하거나 복제하지 않습니다.
+    NewSceneComp->AttachParent = nullptr;
+
+    // 자식 컴포넌트 복제
+    NewSceneComp->AttachChildren.Empty();
+    if (Params.bDeepCopy)
+    {
+        for (USceneComponent* Child : AttachChildren)
+        {
+            if (Child)
+            {
+                FObjectDuplicationParameters ChildParams(
+                    Child,
+                    NewSceneComp, 
+                    NAME_None,
+                    Params.DuplicationFlags,
+                    Params.bDeepCopy,
+                    Params.DuplicationMap ? Params.DuplicationMap : nullptr
+                );
+                USceneComponent* NewChild = static_cast<USceneComponent*>(Child->DuplicateObject(ChildParams));
+                if (NewChild)
+                {
+                    NewSceneComp->AttachChildren.Add(NewChild);
+                    NewChild->AttachParent = NewSceneComp;
+                }
+            }
+        }
+    }
+    else
+    {
+        // 얕은 복사의 경우 원본의 자식 포인터를 그대로 대입합니다.
+        NewSceneComp->AttachChildren = this->AttachChildren;
+    }
+}
+
 FVector USceneComponent::GetWorldRotation()
 {
 	if (AttachParent)

@@ -4,6 +4,8 @@
 #include "Renderer/Renderer.h"
 #include "Engine/ResourceMgr.h"
 
+#include "UObject/ObjectTypes.h"
+
 class UnrealEd;
 class UImGuiManager;
 class UWorld;
@@ -11,6 +13,7 @@ class FEditorViewportClient;
 class SSplitterV;
 class SSplitterH;
 class SLevelEditor;
+struct FObjectDuplicationParameters;
 
 class FEngineLoop
 {
@@ -25,8 +28,13 @@ public:
     float GetAspectRatio(IDXGISwapChain* swapChain) const;
     void Input();
 
+    // test
+    // 현재는 그냥 월드를 복사해서 진행하고 있는데, 
+    void StartPlayInEditor();
 
+    void StopPlayInEditor();
 
+    EWorldType GetWorldType() { return CurrentWorldType; }
 private:
     void WindowInit(HINSTANCE hInstance);
 
@@ -43,11 +51,14 @@ public:
 private:
     UImGuiManager* UIMgr;
     UWorld* GWorld;
+    UWorld* OriginalWorld; // StartPIE하면 쓰던 걸 저장하는 곳
     SLevelEditor* LevelEditor;
     UnrealEd* UnrealEditor;
     bool bIsExit = false;
     const int32 targetFPS = 60;
     bool bTestInput = false;
+
+    EWorldType CurrentWorldType = EWorldType::Editor;
 
 public:
     UWorld* GetWorld() const { return GWorld; }

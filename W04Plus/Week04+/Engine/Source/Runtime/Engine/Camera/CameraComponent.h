@@ -21,6 +21,9 @@ public:
 
     bool IsCameraMode() const { return bRightMouseDown; }
 
+    virtual UObject* DuplicateObject(const FObjectDuplicationParameters& Params) const override;
+    virtual void DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const override;
+
 private:
     float mouseSpeed = 0.25f;
     POINT lastMousePos;

@@ -111,3 +111,25 @@ int UStaticMeshComponent::CheckRayIntersection(FVector& rayOrigin, FVector& rayD
     }
     return nIntersections;
 }
+
+UObject* UStaticMeshComponent::DuplicateObject(const FObjectDuplicationParameters& Params) const
+{
+    UObject* NewObject = Super::DuplicateObject(Params);
+
+    DuplicateProperties(NewObject, Params);
+    return NewObject;
+}
+
+void UStaticMeshComponent::DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const
+{
+    Super::DuplicateProperties(NewObject, Params);
+
+    UStaticMeshComponent* NewComponent = static_cast<UStaticMeshComponent*>(NewObject);
+    if (!NewComponent)
+    {
+        UE_LOG(LogLevel::Error, "DuplicateProperties: NewObject is not UActorComponent");
+        return;
+    }
+    NewComponent->staticMesh = this->staticMesh;
+    NewComponent->selectedSubMeshIndex = this->selectedSubMeshIndex;
+}

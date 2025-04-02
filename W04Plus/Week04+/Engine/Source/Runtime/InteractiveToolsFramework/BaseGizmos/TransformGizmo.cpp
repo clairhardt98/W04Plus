@@ -94,3 +94,88 @@ void UTransformGizmo::Tick(float DeltaTime)
             SetActorRotation(FVector(0.0f, 0.0f, 0.0f));
     }
 }
+
+UObject* UTransformGizmo::DuplicateObject(const FObjectDuplicationParameters& Params) const
+{
+    UObject* NewObject = Super::DuplicateObject(Params);
+    DuplicateProperties(this->GetClass(), Params);
+
+    return NewObject;
+}
+
+void UTransformGizmo::DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const
+{
+    Super::DuplicateProperties(NewObject, Params);
+
+    UTransformGizmo* NewGizmo = Cast<UTransformGizmo>(NewObject);
+    if (!NewGizmo)
+    {
+        UE_LOG(LogLevel::Error, "DuplicateProperties: NewObject is not UTransformGizmo");
+        return;
+    }
+
+    // ArrowArr 복제: 각 Arrow 컴포넌트를 재귀적으로 복제
+    for (UStaticMeshComponent* ArrowComp : ArrowArr)
+    {
+        if (ArrowComp)
+        {
+            FObjectDuplicationParameters CompParams(
+                ArrowComp,
+                NewGizmo, // 새 Gizmo를 Outer로 지정하여 소유 관계 유지
+                NAME_None,
+                Params.DuplicationFlags,
+                Params.bDeepCopy,
+                Params.DuplicationMap ? Params.DuplicationMap : nullptr
+            );
+            UStaticMeshComponent* NewArrowComp = Cast<UStaticMeshComponent>(ArrowComp->DuplicateObject(CompParams));
+            if (NewArrowComp)
+            {
+                NewGizmo->ArrowArr.Add(NewArrowComp);
+                // 필요하다면 새 컴포넌트의 소유자도 NewGizmo로 설정
+                // NewArrowComp->Owner = NewGizmo; 
+            }
+        }
+    }
+
+    // CircleArr 복제: 각 원형 컴포넌트 복제
+    for (UStaticMeshComponent* CircleComp : CircleArr)
+    {
+        if (CircleComp)
+        {
+            FObjectDuplicationParameters CompParams(
+                CircleComp,
+                NewGizmo,
+                NAME_None,
+                Params.DuplicationFlags,
+                Params.bDeepCopy,
+                Params.DuplicationMap ? Params.DuplicationMap : nullptr
+            );
+            UStaticMeshComponent* NewCircleComp = Cast<UStaticMeshComponent>(CircleComp->DuplicateObject(CompParams));
+            if (NewCircleComp)
+            {
+                NewGizmo->CircleArr.Add(NewCircleComp);
+            }
+        }
+    }
+
+    // RectangleArr 복제: 각 사각형 컴포넌트 복제
+    for (UStaticMeshComponent* RectComp : RectangleArr)
+    {
+        if (RectComp)
+        {
+            FObjectDuplicationParameters CompParams(
+                RectComp,
+                NewGizmo,
+                NAME_None,
+                Params.DuplicationFlags,
+                Params.bDeepCopy,
+                Params.DuplicationMap ? Params.DuplicationMap : nullptr
+            );
+            UStaticMeshComponent* NewRectComp = Cast<UStaticMeshComponent>(RectComp->DuplicateObject(CompParams));
+            if (NewRectComp)
+            {
+                NewGizmo->RectangleArr.Add(NewRectComp);
+            }
+        }
+    }
+}

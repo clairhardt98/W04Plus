@@ -27,7 +27,6 @@ public:
         return Obj;
     }
 
-    // 일단 이렇게 만들긴 했는데 ConstructObject와 겹치는게 너무 많아서 없애거나 수정하는게 좋을 듯 함.
     template<typename T>
         requires std::derived_from<T, UObject>
     static T* ConstructObjectFromClass(UClass* InClass, UObject* Outer, FName NewName)
@@ -39,8 +38,9 @@ public:
             : T::StaticClass()->GetName() + "_" + std::to_string(id);
 
         // T 타입으로 생성
-        T* Obj = new T();
-        Obj->ClassPrivate = InClass;
+        T* Obj = new T;
+        // InClass->StaticClass() 하거나 뭐
+        Obj->ClassPrivate = InClass->StaticClass();
         Obj->NamePrivate = FName(*Name);
         Obj->UUID = id;
 

@@ -4,6 +4,7 @@
 #include "UObject/ObjectFactory.h"
 #include "UObject/ObjectMacros.h"
 
+
 class FObjectFactory;
 class AActor;
 class UObject;
@@ -41,6 +42,7 @@ public:
 
     virtual UObject* DuplicateObject(const FObjectDuplicationParameters& Params) const override;
     virtual void DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const override;
+
 
 private:
     const FString defaultMapName = "Default";

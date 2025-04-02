@@ -68,7 +68,7 @@ void AActor::DuplicateProperties(UObject* NewObject, const FObjectDuplicationPar
             // 각 컴포넌트에 대해 동일한 Outer와 DuplicationMap을 사용하여 복제
             FObjectDuplicationParameters CompParams(
                 Comp,
-                Params.Outer, // 또는 NewActor를 Outer로 사용할 수도 있음
+                NewActor,
                 NAME_None,
                 Params.DuplicationFlags,
                 Params.bDeepCopy,
@@ -76,29 +76,33 @@ void AActor::DuplicateProperties(UObject* NewObject, const FObjectDuplicationPar
             );
 
             UActorComponent* DuplicatedComp = static_cast<UActorComponent*>(Comp->DuplicateObject(CompParams));
-            if (DuplicatedComp)
+            UActorComponent* TempComp = new UActorComponent();
+            TempComp = DuplicatedComp;
+            if (TempComp)
             {
-                NewActor->OwnedComponents.Add(DuplicatedComp);
-                DuplicatedComp->Owner = NewActor;
+                if (TempComp == nullptr) continue;
+                //NewActor->OwnedComponents.Add(DuplicatedComp);
+                NewActor->OwnedComponents.Add(TempComp);
+                TempComp->Owner = NewActor;
             }
         }
     }
 
-    //// RootComponent가 존재한다면 이를 복제합니다.
-    //if (RootComponent)
-    //{
-    //    FObjectDuplicationParameters RootParams(
-    //        RootComponent,
-    //        Params.Outer, // 또는 NewActor
-    //        NAME_None,
-    //        Params.DuplicationFlags,
-    //        Params.bDeepCopy,
-    //        Params.DuplicationMap ? Params.DuplicationMap : nullptr
-    //    );
-    //    // USceneComponent는 UObject의 파생 클래스이므로 DuplicateObject를 호출할 수 있습니다.
-    //    USceneComponent* DuplicatedRoot = Cast<USceneComponent>(RootComponent->DuplicateObject(RootParams));
-    //    NewActor->RootComponent = DuplicatedRoot;
-    //}
+    // RootComponent가 존재한다면 이를 복제합니다.
+    if (RootComponent)
+    {
+        FObjectDuplicationParameters RootParams(
+            RootComponent,
+            Params.Outer, // 또는 NewActor
+            NAME_None,
+            Params.DuplicationFlags,
+            Params.bDeepCopy,
+            Params.DuplicationMap ? Params.DuplicationMap : nullptr
+        );
+        // USceneComponent는 UObject의 파생 클래스이므로 DuplicateObject를 호출할 수 있습니다.
+        USceneComponent* DuplicatedRoot = Cast<USceneComponent>(RootComponent->DuplicateObject(RootParams));
+        NewActor->RootComponent = DuplicatedRoot;
+    }
 
 }
 

@@ -13,6 +13,8 @@ public:
     float GetInnerRadius() const { return inner; }
     void SetInnerRadius(float value) { inner = value; }
 
+    virtual UObject* DuplicateObject(const FObjectDuplicationParameters& Params) const override;
+    virtual void DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const override;
 private:
     float inner = 1.0f;
 };

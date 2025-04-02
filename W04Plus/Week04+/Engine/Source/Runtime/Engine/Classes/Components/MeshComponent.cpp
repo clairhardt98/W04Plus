@@ -54,3 +54,33 @@ void UMeshComponent::GetUsedMaterials(TArray<UMaterial*>& Out) const
         }
     }
 }
+
+UObject* UMeshComponent::DuplicateObject(const FObjectDuplicationParameters& Params) const
+{
+    UObject* NewObject = Super::DuplicateObject(Params);
+
+    DuplicateProperties(NewObject, Params);
+    return NewObject;
+}
+
+void UMeshComponent::DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const
+{
+    Super::DuplicateProperties(NewObject, Params);
+
+    UMeshComponent* NewComponent = static_cast<UMeshComponent*>(NewObject);
+    if (!NewComponent)
+    {
+        UE_LOG(LogLevel::Error, "DuplicateProperties: NewObject is not UMeshComponent");
+        return;
+    }
+
+    //if(!NewComponent->OverrideMaterials.IsEmpty()) NewComponent->OverrideMaterials.Empty();
+    //if(OverrideMaterials.Num()>0) NewComponent->OverrideMaterials = this->OverrideMaterials;
+
+    for (auto material : OverrideMaterials)
+    {
+        if (material == nullptr) continue;
+        NewComponent->OverrideMaterials.Add(material);
+    }
+    
+}
