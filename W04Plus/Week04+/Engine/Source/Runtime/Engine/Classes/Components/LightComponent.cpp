@@ -2,17 +2,29 @@
 #include "UBillboardComponent.h"
 #include "Math/JungleMath.h"
 #include "UnrealEd/PrimitiveBatch.h"
+#include "Engine/Classes/GameFramework/Actor.h"
+REGISTER_CLASS(ULightComponentBase, USceneComponent)
 
 ULightComponentBase::ULightComponentBase()
 {
     // FString name = "SpotLight";
     // SetName(name);
-    InitializeLight();
+    
 }
+
 
 ULightComponentBase::~ULightComponentBase()
 {
-    delete texture2D;
+}
+void ULightComponentBase::InitializeComponent()
+{
+    InitializeLight();
+}
+void ULightComponentBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+    Super::EndPlay(EndPlayReason);
+    GetOwner()->RemoveOwnedComponent(texture2D);
+    texture2D = nullptr;
 }
 void ULightComponentBase::SetColor(FVector4 newColor)
 {
@@ -61,9 +73,9 @@ void ULightComponentBase::DuplicateProperties(UObject* NewObject, const FObjectD
 
 void ULightComponentBase::InitializeLight()
 {
-    texture2D = new UBillboardComponent();
+    texture2D = GetOwner()->AddComponent<UBillboardComponent>();
     texture2D->SetTexture(L"Assets/Texture/spotLight.png");
-    texture2D->InitializeComponent();
+    //texture2D->InitializeComponent();
     AABB.max = { 1.f,1.f,0.1f };
     AABB.min = { -1.f,-1.f,-0.1f };
     color = { 1,1,1,1 };

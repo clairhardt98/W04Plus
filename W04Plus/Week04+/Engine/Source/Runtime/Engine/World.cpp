@@ -9,20 +9,13 @@
 #include "Engine/StaticMeshActor.h"
 #include "Components/SkySphereComponent.h"
 
-
+REGISTER_CLASS(UWorld, UObject)
 void UWorld::Initialize()
 {
     // TODO: Load Scene
     CreateBaseObject();
     //SpawnObject(OBJ_CUBE);
     FManagerOBJ::CreateStaticMesh("Assets/Dodge/Dodge.obj");
-
-    FManagerOBJ::CreateStaticMesh("Assets/SkySphere.obj");
-    AActor* SpawnedActor = SpawnActor<AActor>();
-    USkySphereComponent* skySphere = SpawnedActor->AddComponent<USkySphereComponent>();
-    skySphere->SetStaticMesh(FManagerOBJ::GetStaticMesh(L"SkySphere.obj"));
-    skySphere->GetStaticMesh()->GetMaterials()[0]->Material->SetDiffuse(FVector((float)32/255, (float)171/255, (float)191/255));
-
 }
 
 void UWorld::CreateBaseObject()

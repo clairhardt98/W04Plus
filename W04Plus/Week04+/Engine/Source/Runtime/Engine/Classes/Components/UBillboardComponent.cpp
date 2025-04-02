@@ -10,7 +10,7 @@
 #include "LevelEditor/SLevelEditor.h"
 #include "PropertyEditor/ShowFlags.h"
 
-
+REGISTER_CLASS(UBillboardComponent, UPrimitiveComponent)
 UBillboardComponent::UBillboardComponent()
 {
     SetType(StaticClass()->GetName());
@@ -34,6 +34,12 @@ void UBillboardComponent::InitializeComponent()
 {
     Super::InitializeComponent();
 	CreateQuadTextureVertexBuffer();
+    SetTexture(L"Assets/Texture/DefaultTexture.png");
+    if (GetOwner() && GetOwner()->GetRootComponent())
+    {
+        SetUUIDParent(GetOwner()->GetRootComponent());
+    }
+    
 }
 
 

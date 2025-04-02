@@ -6,6 +6,7 @@
 #include "Math/JungleMath.h"
 #include "UnrealEd/EditorViewportClient.h"
 
+REGISTER_CLASS(UGizmoRectangleComponent, UGizmoBaseComponent)
 
 UGizmoRectangleComponent::UGizmoRectangleComponent()
 {

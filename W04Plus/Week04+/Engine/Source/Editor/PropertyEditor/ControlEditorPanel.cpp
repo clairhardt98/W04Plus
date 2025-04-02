@@ -274,9 +274,10 @@ void ControlEditorPanel::CreateModifyButton(ImVec2 ButtonSize, ImFont* IconFont)
                 }
                 case OBJ_CUBE:
                 {
-                    AStaticMeshActor* TempActor = World->SpawnActor<AStaticMeshActor>();
-                    TempActor->SetActorLabel(TEXT("OBJ_CUBE"));
-                    UStaticMeshComponent* MeshComp = TempActor->GetStaticMeshComponent();
+                    SpawnedActor = World->SpawnActor<AStaticMeshActor>();
+                    SpawnedActor->SetActorLabel(TEXT("OBJ_CUBE"));
+                    AStaticMeshActor* StaticMeshActor = Cast<AStaticMeshActor>(SpawnedActor);
+                    UStaticMeshComponent* MeshComp = StaticMeshActor->GetStaticMeshComponent();
                     FManagerOBJ::CreateStaticMesh("Assets/helloBlender.obj");
                     MeshComp->SetStaticMesh(FManagerOBJ::GetStaticMesh(L"helloBlender.obj"));
                     break;
@@ -286,6 +287,8 @@ void ControlEditorPanel::CreateModifyButton(ImVec2 ButtonSize, ImFont* IconFont)
                     SpawnedActor = World->SpawnActor<AActor>();
                     SpawnedActor->SetActorLabel(TEXT("OBJ_SpotLight"));
                     SpawnedActor->AddComponent<ULightComponentBase>();
+                   /* UBillboardComponent* Billboard = SpawnedActor->AddComponent<UBillboardComponent>();
+                    Billboard->SetTexture(L"Assets/Texture/T_SpotLight.png");*/
                     break;
                 }
                 case OBJ_PARTICLE:
@@ -304,9 +307,7 @@ void ControlEditorPanel::CreateModifyButton(ImVec2 ButtonSize, ImFont* IconFont)
                     SpawnedActor = World->SpawnActor<AActor>();
                     SpawnedActor->SetActorLabel(TEXT("OBJ_Text"));
                     UText* TextComponent = SpawnedActor->AddComponent<UText>();
-                    TextComponent->SetTexture(L"Assets/Texture/font.png");
-                    TextComponent->SetRowColumnCount(106, 106);
-                    TextComponent->SetText(L"안녕하세요 Jungle 1");
+
                     break;
                 }
                 case OBJ_TRIANGLE:
@@ -318,7 +319,7 @@ void ControlEditorPanel::CreateModifyButton(ImVec2 ButtonSize, ImFont* IconFont)
         
                 if (SpawnedActor)
                 {
-                    World->SetPickedActor(SpawnedActor);
+                    World->SetPickedComponent(SpawnedActor->GetRootComponent());
                 }
             }
         }

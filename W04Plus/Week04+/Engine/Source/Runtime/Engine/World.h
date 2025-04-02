@@ -54,6 +54,7 @@ private:
     TArray<AActor*> PendingBeginPlayActors;
 
     AActor* SelectedActor = nullptr;
+    USceneComponent* SelectedComponent = nullptr;
 
     USceneComponent* pickingGizmo = nullptr;
     UCameraComponent* camera = nullptr;
@@ -70,12 +71,18 @@ public:
 
 
     // EditorManager 같은데로 보내기
-    AActor* GetSelectedActor() const { return SelectedActor; }
-    void SetPickedActor(AActor* InActor)
-    {
-        SelectedActor = InActor;
-    }
+    //AActor* GetSelectedActor() const { return SelectedActor; }
+    //void SetPickedActor(AActor* InActor)
+    //{
+    //    SelectedActor = InActor;
+    //    SelectedComponent = nullptr;
+    //}
 
+    USceneComponent* GetSelectedComponent() const { return SelectedComponent; }
+    void SetPickedComponent(USceneComponent* InComponent) 
+    {
+        SelectedComponent = InComponent;
+    }
     UObject* GetWorldGizmo() const { return worldGizmo; }
     USceneComponent* GetPickingGizmo() const { return pickingGizmo; }
     void SetPickingGizmo(UObject* Object);

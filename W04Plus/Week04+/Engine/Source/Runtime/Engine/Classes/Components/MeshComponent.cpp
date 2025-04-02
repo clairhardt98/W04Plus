@@ -1,6 +1,6 @@
 #include "MeshComponent.h"
 
-
+REGISTER_CLASS(UMeshComponent, UPrimitiveComponent)
 UMaterial* UMeshComponent::GetMaterial(uint32 ElementIndex) const
 {
     if (OverrideMaterials.IsValidIndex(ElementIndex))

@@ -41,7 +41,7 @@ public:
 
 public:
     /** 이 컴포넌트를 소유하고 있는 Actor를 반환합니다. */
-    AActor* GetOwner() const { return Owner; }
+ AActor* GetOwner() const { return Owner; }
 
     void SetOwner(AActor* InOwner) { Owner = InOwner; }
 
@@ -59,6 +59,8 @@ public:
     /** Component가 현재 활성화 중인지 여부를 반환합니다. */
     bool IsActive() const { return bIsActive; }
 
+    /** Component가 현재 Tick이 활성화 중인지 여부를 반환합니다. */
+    bool bIsComponentTickEnabled() const { return bCanEverTick; }
 
     void Activate();
     void Deactivate();
@@ -76,7 +78,11 @@ private:
     uint8 bIsBeingDestroyed : 1;
 
     /** Component가 현재 활성화 중인지 여부 */
-    uint8 bIsActive:1;
+    uint8 bIsActive : 1;
+
+protected:
+    /** Component의 Tick을 활성화할지 여부*/
+    uint8 bCanEverTick : 1;
 
 public:
     /** Component가 초기화 되었을 때, 자동으로 활성화할지 여부 */

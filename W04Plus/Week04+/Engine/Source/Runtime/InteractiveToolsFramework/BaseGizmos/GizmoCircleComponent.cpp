@@ -7,6 +7,8 @@
 #include "LevelEditor/SLevelEditor.h"
 #define DISC_RESOLUTION 128
 
+REGISTER_CLASS(UGizmoCircleComponent, UGizmoBaseComponent)
+
 UGizmoCircleComponent::UGizmoCircleComponent()
 {
 }

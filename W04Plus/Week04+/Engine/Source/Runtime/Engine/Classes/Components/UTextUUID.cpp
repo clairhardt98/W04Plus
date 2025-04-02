@@ -1,4 +1,7 @@
 #include "UTextUUID.h"
+#include "Engine/Classes/GameFramework/Actor.h"
+
+REGISTER_CLASS(UTextUUID, UText)
 
 UTextUUID::UTextUUID()
 {
@@ -18,6 +21,12 @@ int UTextUUID::CheckRayIntersection(FVector& rayOrigin, FVector& rayDirection, f
 void UTextUUID::SetUUID(uint32 UUID)
 {
     SetText(std::to_wstring(UUID));
+}
+
+void UTextUUID::InitializeComponent()
+{
+    Super::InitializeComponent();
+    SetText(std::to_wstring(GetOwner()->GetUUID()));
 }
 
 

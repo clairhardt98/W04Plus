@@ -4,11 +4,13 @@
 #include "World.h"
 #include "LevelEditor/SLevelEditor.h"
 
+REGISTER_CLASS(UParticleSubUVComp, UBillboardComponent)
 
 UParticleSubUVComp::UParticleSubUVComp()
 {
     SetType(StaticClass()->GetName());
     bIsLoop = true;
+    bCanEverTick = true;
 }
 
 UParticleSubUVComp::~UParticleSubUVComp()

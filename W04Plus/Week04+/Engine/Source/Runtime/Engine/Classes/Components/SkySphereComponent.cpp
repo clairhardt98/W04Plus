@@ -7,7 +7,7 @@
 #include "UnrealEd/EditorViewportClient.h"
 #include "UnrealEd/PrimitiveBatch.h"
 
-
+REGISTER_CLASS(USkySphereComponent, UStaticMeshComponent)
 USkySphereComponent::USkySphereComponent()
 {
     SetType(StaticClass()->GetName());

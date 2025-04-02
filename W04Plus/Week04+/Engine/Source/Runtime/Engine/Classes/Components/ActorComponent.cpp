@@ -2,6 +2,7 @@
 
 #include "GameFramework/Actor.h"
 
+REGISTER_CLASS(UActorComponent, UObject)
 
 void UActorComponent::InitializeComponent()
 {

@@ -4,6 +4,7 @@
 #include "Actors/Player.h"
 #include "Components/LightComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/UBillboardComponent.h"
 #include "Components/UText.h"
 #include "Engine/FLoaderOBJ.h"
 #include "Math/MathUtility.h"
@@ -39,17 +40,20 @@ void PropertyEditorPanel::Render()
     ImGui::Begin("Detail", nullptr, PanelFlags);
     
     AEditorPlayer* player = GEngineLoop.GetWorld()->GetEditorPlayer();
-    AActor* PickedActor = GEngineLoop.GetWorld()->GetSelectedActor();
-    if (PickedActor)
+    //AActor* PickedActor = GEngineLoop.GetWorld()->GetSelectedActor();
+    USceneComponent* PickedComponent = GEngineLoop.GetWorld()->GetSelectedComponent();
+
+    //USceneComponent* CurrentComponent = PickedComponent ? PickedComponent : PickedActor ? PickedActor->GetRootComponent() : nullptr;
+    if (PickedComponent)
     {
         ImGui::SetItemDefaultFocus();
         // TreeNode 배경색을 변경 (기본 상태)
         ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
         if (ImGui::TreeNodeEx("Transform", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) // 트리 노드 생성
         {
-            Location = PickedActor->GetActorLocation();
-            Rotation = PickedActor->GetActorRotation();
-            Scale = PickedActor->GetActorScale();
+            Location = PickedComponent->GetLocalLocation();
+            Rotation = PickedComponent->GetLocalRotation();
+            Scale = PickedComponent->GetLocalScale();
             
             FImGuiWidget::DrawVec3Control("Location", Location, 0, 85);
             ImGui::Spacing();
@@ -60,9 +64,9 @@ void PropertyEditorPanel::Render()
             FImGuiWidget::DrawVec3Control("Scale", Scale, 0, 85);
             ImGui::Spacing();
 
-            PickedActor->SetActorLocation(Location);
-            PickedActor->SetActorRotation(Rotation);
-            PickedActor->SetActorScale(Scale);
+            PickedComponent->SetLocation(Location);
+            PickedComponent->SetRotation(Rotation);
+            PickedComponent->SetScale(Scale);
             
             std::string coordiButtonLabel;
             if (player->GetCoordiMode() == CoordiMode::CDM_WORLD)
@@ -80,8 +84,8 @@ void PropertyEditorPanel::Render()
     }
 
     // TODO: 추후에 RTTI를 이용해서 프로퍼티 출력하기
-    if (PickedActor)
-    if (ULightComponentBase* lightObj = Cast<ULightComponentBase>(PickedActor->GetRootComponent()))
+    if (PickedComponent)
+    if (ULightComponentBase* lightObj = Cast<ULightComponentBase>(PickedComponent))
     {
         ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
         if (ImGui::TreeNodeEx("SpotLight Component", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) // 트리 노드 생성
@@ -158,47 +162,66 @@ void PropertyEditorPanel::Render()
     }
 
     // TODO: 추후에 RTTI를 이용해서 프로퍼티 출력하기
-    if (PickedActor)
-    if (UText* textOBj = Cast<UText>(PickedActor->GetRootComponent()))
+    if (PickedComponent)
+    if (UText* textOBj = Cast<UText>(PickedComponent))
     {
         ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
-        if (ImGui::TreeNodeEx("Text Component", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) // 트리 노드 생성
+        if (ImGui::TreeNodeEx("Text Component", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen))
+{
+    if (textOBj) {
+        textOBj->SetTexture(L"Assets/Texture/font.png");
+        textOBj->SetRowColumnCount(106, 106);
+        FWString wText = textOBj->GetText();
+        int len = WideCharToMultiByte(CP_UTF8, 0, wText.c_str(), -1, nullptr, 0, nullptr, nullptr);
+        std::string u8Text(len, '\0');
+        WideCharToMultiByte(CP_UTF8, 0, wText.c_str(), -1, u8Text.data(), len, nullptr, nullptr);
+
+        static char buf[256];
+        // Copy only up to first null character
+        size_t copy_len = strnlen(u8Text.c_str(), sizeof(buf) - 1);
+        strncpy_s(buf, u8Text.c_str(), copy_len);
+        buf[copy_len] = '\0';  // Ensure null-termination
+
+        ImGui::Text("Text: ", buf);
+        ImGui::SameLine();
+        ImGui::PushItemFlag(ImGuiItemFlags_NoNavDefaultFocus, true);
+        if (ImGui::InputText("##Text", buf, 256, ImGuiInputTextFlags_EnterReturnsTrue))
         {
-            if (textOBj) {
-                textOBj->SetTexture(L"Assets/Texture/font.png");
-                textOBj->SetRowColumnCount(106, 106);
-                FWString wText = textOBj->GetText();
-                int len = WideCharToMultiByte(CP_UTF8, 0, wText.c_str(), -1, nullptr, 0, nullptr, nullptr);
-                std::string u8Text(len, '\0');
-                WideCharToMultiByte(CP_UTF8, 0, wText.c_str(), -1, u8Text.data(), len, nullptr, nullptr);
+            // Trim to first null character
+            size_t len = strnlen(buf, sizeof(buf));
+            while (len > 0 && (buf[len - 1] == '\n' || buf[len - 1] == '\r'))
+                buf[--len] = '\0';
 
-                static char buf[256];
-                strcpy_s(buf, u8Text.c_str());
-
-                ImGui::Text("Text: ", buf);
-                ImGui::SameLine();
-                ImGui::PushItemFlag(ImGuiItemFlags_NoNavDefaultFocus, true);
-                if (ImGui::InputText("##Text", buf, 256, ImGuiInputTextFlags_EnterReturnsTrue))
-                {
-                    textOBj->ClearText();
-                    int wlen = MultiByteToWideChar(CP_UTF8, 0, buf, -1, nullptr, 0);
-                    FWString newWText(wlen, L'\0');
-                    MultiByteToWideChar(CP_UTF8, 0, buf, -1, newWText.data(), wlen);
-                    textOBj->SetText(newWText);
-                }
-                ImGui::PopItemFlag();
-            }
-            ImGui::TreePop();
+            textOBj->ClearText();
+            int wlen = MultiByteToWideChar(CP_UTF8, 0, buf, -1, nullptr, 0);
+            FWString newWText(wlen, L'\0');
+            MultiByteToWideChar(CP_UTF8, 0, buf, -1, newWText.data(), wlen);
+            textOBj->SetText(newWText);
         }
+        ImGui::PopItemFlag();
+    }
+    bool bBillboard = textOBj->GetBillboardMode();
+    if (ImGui::Checkbox("Enable Billboard", &bBillboard)) {
+        textOBj->SetBillboardMode(bBillboard);
+    }
+
+    ImGui::TreePop();
+}
         ImGui::PopStyleColor();
     }
 
     // TODO: 추후에 RTTI를 이용해서 프로퍼티 출력하기
-    if (PickedActor)
-    if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(PickedActor->GetRootComponent()))
+    if (PickedComponent)
+    if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(PickedComponent))
     {
         RenderForStaticMesh(StaticMeshComponent);
         RenderForMaterial(StaticMeshComponent);
+    }
+
+    // !TODO : 빌보드 컴포넌트의 경우, 텍스쳐를 변경할 수 있도록 추가
+    if (UBillboardComponent* BillboardComponent = Cast<UBillboardComponent>(PickedComponent))
+    {
+        RenderForBillboard(BillboardComponent);
     }
     ImGui::End();
 }
@@ -260,18 +283,21 @@ void PropertyEditorPanel::HSVToRGB(float h, float s, float v, float& r, float& g
 
 void PropertyEditorPanel::RenderForStaticMesh(UStaticMeshComponent* StaticMeshComp)
 {
-    if (StaticMeshComp->GetStaticMesh() == nullptr)
-    {
-        return;
-    }
+    //if (StaticMeshComp->GetStaticMesh() == nullptr)
+    //{
+    //    return;
+    //}
     
+    UStaticMesh* StaticMesh = StaticMeshComp->GetStaticMesh();
+
     ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.1f, 0.1f, 0.1f, 1.0f));
     if (ImGui::TreeNodeEx("Static Mesh", ImGuiTreeNodeFlags_Framed | ImGuiTreeNodeFlags_DefaultOpen)) // 트리 노드 생성
     {
         ImGui::Text("StaticMesh");
         ImGui::SameLine();
 
-        FString PreviewName = StaticMeshComp->GetStaticMesh()->GetRenderData()->DisplayName;
+        FString PreviewName = StaticMesh ? StaticMesh->GetRenderData()->DisplayName : TEXT("None");
+
         const TMap<FWString, UStaticMesh*> Meshes = FManagerOBJ::GetStaticMeshes();
         if (ImGui::BeginCombo("##StaticMesh", GetData(PreviewName), ImGuiComboFlags_None))
         {
@@ -565,6 +591,44 @@ void PropertyEditorPanel::RenderCreateMaterialView()
     }
 
     ImGui::End();
+}
+
+void PropertyEditorPanel::RenderForBillboard(UBillboardComponent* BillboardComp)
+{
+    if (!BillboardComp) return;
+
+    auto& TextureMap = FEngineLoop::resourceMgr.GetTextureMap();
+    if (TextureMap.IsEmpty()) return;
+
+    // 콤보박스 레이블에 현재 선택된 텍스처 표시
+    FTexture* CurrentTexture = BillboardComp->Texture.get();
+
+    std::string currentAnsiName = CurrentTexture ? *CurrentTexture->Name : "None";
+
+        
+    if (ImGui::BeginCombo("Texture", currentAnsiName.c_str()))
+    {
+        for (const auto& kvp : TextureMap)
+        {
+            FWString TextureName = kvp.Key;
+            std::string ansiName(TextureName.begin(), TextureName.end());
+
+            if (ImGui::Selectable(ansiName.c_str(), false))
+            {
+                // 선택 시 바로 텍스처 적용
+                BillboardComp->SetTexture(TextureName);
+            }
+        }
+        ImGui::EndCombo();
+    }
+
+    // 선택된 텍스처 미리보기 (옵션)
+    //if (!CurrentTextureName.empty())
+    //{
+    //    ImGui::Text("Preview:");
+    //    ImTextureID texId = (ImTextureID)BillboardComp->GetTextureID();
+    //    ImGui::Image(texId, ImVec2(100, 100));
+    //}
 }
 
 void PropertyEditorPanel::OnResize(HWND hWnd)

@@ -3,6 +3,7 @@
 #include <sstream>
 #include <wincodec.h>
 #include <ranges>
+#include <filesystem>
 #include "Define.h"
 #include "Components/SkySphereComponent.h"
 #include "D3D11RHI/GraphicDevice.h"
@@ -33,6 +34,7 @@ void FResourceMgr::Initialize(FRenderer* renderer, FGraphicsDevice* device)
 	LoadTextureFromDDS(device->Device, device->DeviceContext, L"Assets/Texture/UUID_Font.dds");
 	LoadTextureFromFile(device->Device, device->DeviceContext, L"Assets/Texture/Wooden Crate_Crate_BaseColor.png");
 	LoadTextureFromFile(device->Device, device->DeviceContext, L"Assets/Texture/spotLight.png");
+    LoadTextureFromFile(device->Device, device->DeviceContext, L"Assets/Texture/DefaultTexture.png");
 }
 
 void FResourceMgr::Release(FRenderer* renderer) {
@@ -159,7 +161,12 @@ HRESULT FResourceMgr::LoadTextureFromFile(ID3D11Device* device, ID3D11DeviceCont
 	device->CreateSamplerState(&samplerDesc, &SamplerState);
 	FWString name = FWString(filename);
 
-	textureMap[name] = std::make_shared<FTexture>(TextureSRV, Texture2D, SamplerState, width, height);
+    namespace fs = std::filesystem;
+
+    fs::path pathObj(name);
+    std::string stem = pathObj.stem().string();
+
+	textureMap[name] = std::make_shared<FTexture>(TextureSRV, Texture2D, SamplerState, width, height, stem);
 
 	Console::GetInstance().AddLog(LogLevel::Warning, "Texture File Load Successs");
 	return hr;
@@ -211,10 +218,14 @@ HRESULT FResourceMgr::LoadTextureFromDDS(ID3D11Device* device, ID3D11DeviceConte
 
 	device->CreateSamplerState(&samplerDesc, &SamplerState);
 #pragma endregion Sampler
+    namespace fs = std::filesystem;
 
 	FWString name = FWString(filename);
 
-	textureMap[name] = std::make_shared<FTexture>(textureView, texture2D, SamplerState, width, height);
+    fs::path pathObj(name);
+    std::string stem = pathObj.stem().string();
+
+	textureMap[name] = std::make_shared<FTexture>(textureView, texture2D, SamplerState, width, height, stem);
 
 	Console::GetInstance().AddLog(LogLevel::Warning, "Texture File Load Successs");
 

@@ -2,6 +2,8 @@
 #include "Engine/FLoaderOBJ.h"
 #include "UObject/ObjectFactory.h"
 
+REGISTER_CLASS(UStaticMesh, UObject)
+
 UStaticMesh::UStaticMesh()
 {
 

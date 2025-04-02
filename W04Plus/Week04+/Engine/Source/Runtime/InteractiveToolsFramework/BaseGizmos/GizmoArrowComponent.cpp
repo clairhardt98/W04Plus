@@ -6,6 +6,7 @@
 #include "UnrealEd/EditorViewportClient.h"
 #include "LevelEditor/SLevelEditor.h"
 
+REGISTER_CLASS(UGizmoArrowComponent, UGizmoBaseComponent)
 
 UGizmoArrowComponent::UGizmoArrowComponent()
 {

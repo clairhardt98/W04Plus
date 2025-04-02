@@ -30,8 +30,6 @@ public:
     std::shared_ptr<FTexture> Texture;
 protected:
 
-
-
     USceneComponent* m_parent = nullptr;
 
     bool CheckPickingOnNDC(const TArray<FVector>& checkQuad, float& hitDistance);

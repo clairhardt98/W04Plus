@@ -990,6 +990,10 @@ void FRenderer::PrepareRender()
         {
             LightObjs.Add(pLightComp);
         }
+        if (UText* TextComp = Cast<UText>(iter))
+        {
+            TextObjs.Add(TextComp);
+        }
     }
 }
 
@@ -1013,7 +1017,10 @@ void FRenderer::Render(UWorld* World, std::shared_ptr<FEditorViewportClient> Act
         RenderStaticMeshes(World, ActiveViewport);
     RenderGizmos(World, ActiveViewport);
     if (ActiveViewport->GetShowFlag() & static_cast<uint64>(EEngineShowFlags::SF_BillboardText))
+    {
         RenderBillboards(World, ActiveViewport);
+        RenderText(World, ActiveViewport);
+    }
     RenderLight(World, ActiveViewport);
     
     ClearRenderArr();
@@ -1034,7 +1041,7 @@ void FRenderer::RenderStaticMeshes(UWorld* World, std::shared_ptr<FEditorViewpor
         // 노말 회전시 필요 행렬
         FMatrix NormalMatrix = FMatrix::Transpose(FMatrix::Inverse(Model));
         FVector4 UUIDColor = StaticMeshComp->EncodeUUID() / 255.0f;
-        if (World->GetSelectedActor() == StaticMeshComp->GetOwner())
+        if (World->GetSelectedComponent() == StaticMeshComp)
         {
             UpdateConstant(MVP, NormalMatrix, UUIDColor, true);
         }
@@ -1071,7 +1078,7 @@ void FRenderer::RenderStaticMeshes(UWorld* World, std::shared_ptr<FEditorViewpor
 
 void FRenderer::RenderGizmos(const UWorld* World, const std::shared_ptr<FEditorViewportClient>& ActiveViewport)
 {
-    if (!World->GetSelectedActor())
+    if (!World->GetSelectedComponent())
     {
         return;
     }
@@ -1158,13 +1165,6 @@ void FRenderer::RenderBillboards(UWorld* World, std::shared_ptr<FEditorViewportC
                 SubUVParticle->indexTextureBuffer, SubUVParticle->numIndices, SubUVParticle->Texture->TextureSRV, SubUVParticle->Texture->SamplerState
             );
         }
-        else if (UText* Text = Cast<UText>(BillboardComp))
-        {
-            FEngineLoop::renderer.RenderTextPrimitive(
-                Text->vertexTextBuffer, Text->numTextVertices,
-                Text->Texture->TextureSRV, Text->Texture->SamplerState
-            );
-        }
         else
         {
             RenderTexturePrimitive(
@@ -1173,6 +1173,35 @@ void FRenderer::RenderBillboards(UWorld* World, std::shared_ptr<FEditorViewportC
             );
         }
     }
+    PrepareShader();
+}
+
+void FRenderer::RenderText(UWorld* World, std::shared_ptr<FEditorViewportClient> ActiveViewport)
+{
+    PrepareTextureShader();
+    PrepareSubUVConstant();
+
+    for (UText* TextComp : TextObjs)
+    {
+        if (TextComp)
+        {
+            FEngineLoop::renderer.PrepareTextureShader();
+            FEngineLoop::renderer.UpdateSubUVConstant(0, 0);
+            FMatrix Model = TextComp-> GetBillboardMode() ? TextComp->CreateBillboardMatrix() : TextComp->CreateStandardModelMatrix();
+            FMatrix View = ActiveViewport->GetViewMatrix();
+            FMatrix Proj = ActiveViewport->GetProjectionMatrix();
+
+            FMatrix MVP = Model * View * Proj;
+            FMatrix NormalMatrix = FMatrix::Transpose(FMatrix::Inverse(Model));
+
+            FVector4 UUIDColor = TextComp-> EncodeUUID() / 255.0f;
+            bool bSelected = (World -> GetSelectedComponent() == TextComp);
+
+            FEngineLoop::renderer.UpdateConstant(MVP, NormalMatrix, UUIDColor, bSelected);
+            FEngineLoop::renderer.RenderTextPrimitive(TextComp->vertexTextBuffer, TextComp->numTextVertices, TextComp->Texture->TextureSRV, TextComp->Texture->SamplerState);
+        }
+    }
+
     PrepareShader();
 }
 
