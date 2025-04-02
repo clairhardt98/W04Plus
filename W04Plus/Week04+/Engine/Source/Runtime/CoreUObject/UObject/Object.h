@@ -2,6 +2,7 @@
 #include "EngineLoop.h"
 #include "NameTypes.h"
 
+
 extern FEngineLoop GEngineLoop;
 
 class UClass;
@@ -37,10 +38,8 @@ public:
     UObject();
     virtual ~UObject() = default;
 
-    UWorld* GetWorld()
-    {
-        return GEngineLoop.GetWorld();
-    }
+    UWorld* GetWorld();
+
 
     FEngineLoop& GetEngine()
     {
@@ -69,6 +68,12 @@ public:
 public:
     virtual void DuplicateSiblings(UObject* Outer) {}
     virtual UObject* Duplicate(UObject* Outer, UClass* ClassInfo) { return nullptr; }
+
+protected:
+    UObject* Outer = nullptr;
+public:
+    UObject* GetOuter() const { return Outer; }
+    void SetOuter(UObject* InOuter) { Outer = InOuter; }
 
 
 public:
@@ -102,5 +107,4 @@ public:
 
         return result;
     }
-private:
 };

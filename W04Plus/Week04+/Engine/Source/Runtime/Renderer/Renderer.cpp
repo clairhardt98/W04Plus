@@ -20,6 +20,9 @@
 #include "PropertyEditor/ShowFlags.h"
 #include "UObject/UObjectIterator.h"
 #include "Components/SkySphereComponent.h"
+#include "EngineLoop.h"
+
+extern FEngineLoop GEngineLoop;
 
 void FRenderer::Initialize(FGraphicsDevice* graphics)
 {
@@ -973,6 +976,8 @@ void FRenderer::PrepareRender()
 {
     for (const auto iter : TObjectRange<USceneComponent>())
     {
+        if (iter->GetWorld()->GetWorldType() != GEngineLoop.GetWorld()->GetWorldType())
+            continue;
         if (UStaticMeshComponent* pStaticMeshComp = Cast<UStaticMeshComponent>(iter))
         {
             if (!Cast<UGizmoBaseComponent>(iter))

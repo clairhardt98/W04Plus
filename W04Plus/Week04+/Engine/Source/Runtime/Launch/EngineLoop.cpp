@@ -252,6 +252,7 @@ void FEngineLoop::StartPlayInEditor()
     if (PIEWorld)
     {
         UE_LOG(LogLevel::Display, "World duplicated for PIE mode.");
+        PIEWorld->SetWorldType(EWorldType::PIE);
         GWorld = PIEWorld;
     }
     else
@@ -268,11 +269,11 @@ void FEngineLoop::StopPlayInEditor()
         if (GWorld && GWorld != OriginalWorld)
         {
             GWorld->Release();
-            delete GWorld;
         }
 
         GWorld = OriginalWorld;
-        OriginalWorld = nullptr;
+        //GWorld->CreateBaseObject();
+        //OriginalWorld = nullptr;
         UE_LOG(LogLevel::Display, "PIE stopped. Restored original world.");
     }
     else

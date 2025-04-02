@@ -150,7 +150,7 @@ T* AActor::AddComponent()
             NewSceneComp->SetupAttachment(RootComponent);
         }
     }
-
+    Component->SetOuter(this);
     // TODO: RegisterComponent() 생기면 제거
     Component->InitializeComponent();
 

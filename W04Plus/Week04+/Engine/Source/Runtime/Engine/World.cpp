@@ -22,19 +22,20 @@ void UWorld::CreateBaseObject()
 {
     if (EditorPlayer == nullptr)
     {
-        EditorPlayer = FObjectFactory::ConstructObject<AEditorPlayer>();;
+        EditorPlayer = SpawnActor<AEditorPlayer>();;
     }
 
     if (camera == nullptr)
     {
         camera = FObjectFactory::ConstructObject<UCameraComponent>();
+        camera->SetOuter(this);
         camera->SetLocation(FVector(8.0f, 8.0f, 8.f));
         camera->SetRotation(FVector(0.0f, 45.0f, -135.0f));
     }
 
     if (LocalGizmo == nullptr)
     {
-        LocalGizmo = FObjectFactory::ConstructObject<UTransformGizmo>();
+        LocalGizmo = SpawnActor<UTransformGizmo>();
     }
 }
 
@@ -42,25 +43,25 @@ void UWorld::ReleaseBaseObject()
 {
     if (LocalGizmo)
     {
-        delete LocalGizmo;
+        GUObjectArray.MarkRemoveObject(LocalGizmo);
         LocalGizmo = nullptr;
     }
 
     if (worldGizmo)
     {
-        delete worldGizmo;
+        GUObjectArray.MarkRemoveObject(worldGizmo);
         worldGizmo = nullptr;
     }
 
     if (camera)
     {
-        delete camera;
+        GUObjectArray.MarkRemoveObject(camera);
         camera = nullptr;
     }
 
     if (EditorPlayer)
     {
-        delete EditorPlayer;
+        GUObjectArray.MarkRemoveObject(EditorPlayer);
         EditorPlayer = nullptr;
     }
 
@@ -102,6 +103,7 @@ void UWorld::Release()
 
 	pickingGizmo = nullptr;
 	ReleaseBaseObject();
+    GUObjectArray.MarkRemoveObject(this);
 
     GUObjectArray.ProcessPendingDestroyObjects();
 }
@@ -160,6 +162,7 @@ AActor* UWorld::SpawnActorByClass(UClass* ActorClass, bool bCallBeginPlay)
     {
         PendingBeginPlayActors.Add(Actor);
     }
+    Actor->SetOuter(this);
 
     return Actor;
 }

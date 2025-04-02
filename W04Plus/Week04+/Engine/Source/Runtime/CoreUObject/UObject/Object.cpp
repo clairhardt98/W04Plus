@@ -2,6 +2,8 @@
 
 #include "UClass.h"
 #include "UObjectHash.h"
+#include "CoreUObject/UObject/Casts.h"
+#include "World.h"
 
 
 UClass* UObject::StaticClass()
@@ -16,6 +18,21 @@ UObject::UObject()
     , InternalIndex(std::numeric_limits<uint32>::max())
     , NamePrivate("None")
 {
+}
+
+UWorld* UObject::GetWorld()
+{
+    UObject* CrrOuter = GetOuter();
+    while (CrrOuter)
+    {
+        UWorld* World = dynamic_cast<UWorld*>(CrrOuter);
+        if (World)
+        {
+            return World;
+        }
+        CrrOuter = CrrOuter->GetOuter();
+    }
+    return nullptr;
 }
 
 bool UObject::IsA(const UClass* SomeBase) const

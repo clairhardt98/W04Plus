@@ -3,6 +3,7 @@
 #include "Container/Set.h"
 #include "UObject/ObjectFactory.h"
 #include "UObject/ObjectMacros.h"
+#include "CoreUObject/UObject/Casts.h"
 
 class FObjectFactory;
 class AActor;
@@ -86,6 +87,12 @@ public:
     // Duplicate
     void DuplicateSiblings(UObject* Outer) override;
     UObject* Duplicate(UObject* Outer, UClass* ClassInfo) override;
+
+public:
+    EWorldType GetWorldType() const { return WorldType; }
+    void SetWorldType(EWorldType InType) { WorldType = InType; }
+private:
+    EWorldType WorldType = EWorldType::Editor;
 };
 
 
@@ -99,5 +106,6 @@ T* UWorld::SpawnActor()
     // Actor->InitializeComponents();
     ActorsArray.Add(Actor);
     PendingBeginPlayActors.Add(Actor);
+    Actor->SetOuter(this);
     return Actor;
 }

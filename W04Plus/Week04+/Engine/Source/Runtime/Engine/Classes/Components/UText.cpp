@@ -182,20 +182,6 @@ FMatrix UText::CreateStandardModelMatrix()
 
 UObject* UText::Duplicate(UObject* Outer, UClass* ClassInfo)
 {
-
-    TArray<FVertexTexture> vertexTextureArr;
-    std::shared_ptr<FTexture> Texture;
-    ID3D11Buffer* vertexTextBuffer = nullptr;
-    UINT numTextVertices = 0;
-    FWString text;
-    TArray<FVector> quad;
-    int RowCount = 0;
-    int ColumnCount = 0;
-    int quadSize = 2;
-    float quadWidth = 2.0f;
-    float quadHeight = 2.0f;
-    bool bBillboardMode = true;
-
     UText* NewComponent = Cast<UText>(Super::Duplicate(Outer, ClassInfo));
     NewComponent->vertexTextureArr = vertexTextureArr;
     NewComponent->Texture = Texture;

@@ -490,7 +490,10 @@ void ControlEditorPanel::CreatePIEButton(ImVec2 ButtonSize, ImFont* IconFont)
     }
     if (ImGui::Button("\e923 ", ButtonSize))// Play
     {
-        GEngineLoop.StartPlayInEditor();
+        if (GEngineLoop.GetWorld()->GetWorldType() == EWorldType::Editor)
+            GEngineLoop.StartPlayInEditor();
+        else if (GEngineLoop.GetWorld()->GetWorldType() == EWorldType::PIE)
+            GEngineLoop.StopPlayInEditor();
     }
 
     if (WorldType == EWorldType::Editor)

@@ -192,6 +192,8 @@ UActorComponent* AActor::AddComponentByClass(UClass* ComponentClass)
 
     OwnedComponents.Add(Component);
     Component->Owner = this;
+    Component->SetOuter(this);
+
     if (USceneComponent* NewSceneComp = Cast<USceneComponent>(Component))
     {
         if (RootComponent == nullptr)
