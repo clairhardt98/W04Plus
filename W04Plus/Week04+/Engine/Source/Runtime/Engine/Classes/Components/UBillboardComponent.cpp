@@ -65,6 +65,9 @@ int UBillboardComponent::CheckRayIntersection(FVector& rayOrigin, FVector& rayDi
 void UBillboardComponent::SetTexture(FWString _fileName)
 {
 	Texture = FEngineLoop::resourceMgr.GetTexture(_fileName);
+
+    // FTexture에 이미 생성된 Shader Resource View를 사용
+    TextureID = Texture ? Texture->TextureSRV : nullptr;
 }
 
 void UBillboardComponent::SetUUIDParent(USceneComponent* _parent)

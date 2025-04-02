@@ -10,7 +10,7 @@ public:
 public:
     virtual void Render() override;
     virtual void OnResize(HWND hWnd) override;
-    void RenderAddComponentCombo(AActor* SelectedActor);
+    //void RenderAddComponentCombo(AActor* SelectedActor);
     
 private:
     float Width = 0, Height = 0;
