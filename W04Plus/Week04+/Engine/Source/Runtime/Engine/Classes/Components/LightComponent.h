@@ -26,10 +26,10 @@ private:
     FVector4 color;
     float radius;
     FBoundingBox AABB;
-    UBillboardComponent* texture2D;
+
 public:
     FBoundingBox GetBoundingBox() const {return AABB;}
     float GetRadius() {return radius;}
     FVector4 GetColor() {return color;}
-    UBillboardComponent* GetTexture2D() const {return texture2D;}
+  
 };
