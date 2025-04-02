@@ -151,7 +151,7 @@ void UText::TextMVPRendering()
     FMatrix NormalMatrix = FMatrix::Transpose(FMatrix::Inverse(Model));
 
     FVector4 UUIDColor = EncodeUUID() / 255.0f;
-    bool bSelected = (GetWorld()->GetSelectedActor() == GetOwner());
+    bool bSelected = (GetWorld()->GetSelectedComponent() == this);
 
     FEngineLoop::renderer.UpdateConstant(MVP, NormalMatrix, UUIDColor, bSelected);
     FEngineLoop::renderer.RenderTextPrimitive(vertexTextBuffer, numTextVertices, Texture->TextureSRV, Texture->SamplerState);
