@@ -80,34 +80,22 @@ UObject* USceneComponent::DuplicateObject(const FObjectDuplicationParameters& Pa
 
 void USceneComponent::DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const
 {
+    // 부모의 복제 작업 먼저 수행
     Super::DuplicateProperties(NewObject, Params);
-    USceneCompoonent* NewSceneComp = static_cast<USceneComponent*>(NewObject);
-    USceneComponent* TempComp = new USceneComponent();
-    TempComp->bHasBeenInitialized = NewObject->bHasBeenInitialized;
-    TempComp->bHasBegunPlay = NewObject->bHasBegunPlay;
-    TempComp->bIsBeingDestyed = NewObject->bIsBeingDestroyed;
-    TempComp->bIsActive = NewObject->bIsActive;
-    TempComp->bAutoActive = NewObject->bAutoActive;
 
-    TempComp->SetOwner(NewSceneComp->GetOwner());
-    TempComp->
-
-    if (!TempComp)
+    USceneComponent* NewSceneComp = static_cast<USceneComponent*>(NewObject);
+    if (!NewSceneComp)
     {
         UE_LOG(LogLevel::Error, "DuplicateProperties: NewObject is not USceneComponent");
         return;
     }
 
-    // 트랜스폼 정보 복사 (값 형식이므로 단순 대입)
-    TempComp->RelativeLocation = NewObject->RelativeLocation;
-    TempComp->RelativeRotation = NewObject->RelativeRotation;
-    TempComp->QuatRotation = NewObject->QuatRotation;
-    TempComp->RelativeScale3D = NewObject->RelativeScale3D;
+    // 기본 트랜스폼 정보 복사 (값 형식이므로 단순 대입)
+    NewSceneComp->RelativeLocation = this->RelativeLocation;
+    NewSceneComp->RelativeRotation = this->RelativeRotation;
+    NewSceneComp->QuatRotation = this->QuatRotation;
+    NewSceneComp->RelativeScale3D = this->RelativeScale3D;
 
-    // AttachParent는 보통 복제 과정에서 외부에서 재설정하도록 하거나 복제하지 않습니다.
-    NewSceneComp->AttachParent = nullptr;
-
-    // 자식 컴포넌트 복제
     NewSceneComp->AttachChildren.Empty();
     if (Params.bDeepCopy)
     {
@@ -134,8 +122,8 @@ void USceneComponent::DuplicateProperties(UObject* NewObject, const FObjectDupli
     }
     else
     {
-        // 얕은 복사의 경우 원본의 자식 포인터를 그대로 대입합니다.
-        NewSceneComp->AttachChildren = this->AttachChildren;
+        // 얕은 복사의 경우, AttachChildren 배열의 포인터만 복사할 수 있습니다.
+        NewSceneComp->AttachChildren = AttachChildren;
     }
 }
 
