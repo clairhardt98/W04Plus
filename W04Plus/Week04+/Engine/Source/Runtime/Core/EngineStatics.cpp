@@ -1,5 +1,9 @@
+#pragma once
+
 #include "EngineStatics.h"
 #include "Define.h"
+
+
 uint32 UEngineStatics::NextUUID = 0;
 
 UEngineStatics::UEngineStatics()

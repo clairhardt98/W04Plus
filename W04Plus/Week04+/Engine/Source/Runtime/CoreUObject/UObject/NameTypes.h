@@ -1,8 +1,7 @@
-﻿#pragma once
+#pragma once
 #include "Core/HAL/PlatformType.h"
 
 class FString;
-
 
 class FName
 {
@@ -22,4 +21,7 @@ public:
     uint32 GetComparisonIndex() const { return ComparisonIndex; }
 
     bool operator==(const FName& Other) const;
+
 };
+
+const FName NAME_None("None");

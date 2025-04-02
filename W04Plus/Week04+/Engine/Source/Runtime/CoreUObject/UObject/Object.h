@@ -7,6 +7,47 @@ extern FEngineLoop GEngineLoop;
 class UClass;
 class UWorld;
 
+namespace EDuplicateMode
+{
+    enum Type
+    {
+        /** No specific information about the reason for duplication */
+        Normal,
+        /** Object is being duplicated as part of a world duplication */
+        World,
+        /** Object is being duplicated as part of the process for entering Play In Editor */
+        PIE
+    };
+};
+
+struct FObjectDuplicationParameters {
+    const class UObject* SourceObject;
+    // Outer; 유효하지 않으면 Transient Package
+    UObject* Outer;
+    FName NewName;
+    // 복제 플래그
+    uint32 DuplicationFlags;
+    bool bDeepCopy;
+    // 순환 참조 처리를 위한 매핑 테이블 (없으면 nullptr)
+    std::unordered_map<const UObject*, UObject*>* DuplicationMap;
+
+    FObjectDuplicationParameters(
+        const UObject* InSourceObject,
+        UObject* InOuter = nullptr,
+        FName InNewName = NAME_None,
+        uint32 InDuplicationFlags = 0,
+        bool bInDeepCopy = true,
+        std::unordered_map<const UObject*, UObject*>* InDuplicationMap = nullptr
+    )
+        : SourceObject(InSourceObject)
+        , Outer(InOuter)
+        , NewName(InNewName)
+        , DuplicationFlags(InDuplicationFlags)
+        , bDeepCopy(bInDeepCopy)
+        , DuplicationMap(InDuplicationMap)
+    {
+    }
+};
 
 class UObject
 {
@@ -55,6 +96,8 @@ public:
 
     UClass* GetClass() const { return ClassPrivate; }
 
+    virtual UObject* DuplicateObject(const FObjectDuplicationParameters& Params) const;
+    virtual void DuplicateProperties(UObject* NewObject, const FObjectDuplicationParameters& Params) const {}
 
     /** this가 SomeBase인지, SomeBase의 자식 클래스인지 확인합니다. */
     bool IsA(const UClass* SomeBase) const;

@@ -1,5 +1,6 @@
 #pragma once
 #include "Define.h"
+
 class UEngineStatics
 {
 public:
@@ -7,5 +8,6 @@ public:
     ~UEngineStatics();
     static uint32 GenUUID();
     static uint32 NextUUID;
+
 };
 
