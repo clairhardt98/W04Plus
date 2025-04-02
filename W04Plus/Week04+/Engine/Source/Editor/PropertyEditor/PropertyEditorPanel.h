@@ -4,12 +4,15 @@
 
 class UStaticMeshComponent;
 class UBillboardComponent;
+class USceneComponent;
 
 class PropertyEditorPanel : public UEditorPanel
 {
 public:
     virtual void Render() override;
     virtual void OnResize(HWND hWnd) override;
+
+    void RenderAddComponentCombo(USceneComponent* SelectedComponent);
 
 
 private:

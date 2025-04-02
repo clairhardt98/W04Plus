@@ -28,6 +28,10 @@ public:
     float finalIndexU = 0.0f;
     float finalIndexV = 0.0f;
     std::shared_ptr<FTexture> Texture;
+
+    ID3D11ShaderResourceView* GetTextureID() { return TextureID; }
+
+    ID3D11ShaderResourceView* TextureID;
 protected:
 
     USceneComponent* m_parent = nullptr;
