@@ -56,6 +56,7 @@ private:
     AActor* SelectedActor = nullptr;
     USceneComponent* SelectedComponent = nullptr;
 
+
     USceneComponent* pickingGizmo = nullptr;
     UCameraComponent* camera = nullptr;
     AEditorPlayer* EditorPlayer = nullptr;
@@ -71,12 +72,12 @@ public:
 
 
     // EditorManager 같은데로 보내기
-    //AActor* GetSelectedActor() const { return SelectedActor; }
-    //void SetPickedActor(AActor* InActor)
-    //{
-    //    SelectedActor = InActor;
-    //    SelectedComponent = nullptr;
-    //}
+    AActor* GetSelectedActor() const { return SelectedActor; }
+    void SetPickedActor(AActor* InActor)
+    {
+        SelectedActor = InActor;
+        SelectedComponent = nullptr;
+    }
 
     USceneComponent* GetSelectedComponent() const { return SelectedComponent; }
     void SetPickedComponent(USceneComponent* InComponent) 

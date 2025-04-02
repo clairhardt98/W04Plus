@@ -4,13 +4,13 @@
 
 class UStaticMeshComponent;
 class UBillboardComponent;
+class USceneComponent;
 
 class PropertyEditorPanel : public UEditorPanel
 {
 public:
     virtual void Render() override;
     virtual void OnResize(HWND hWnd) override;
-
 
 private:
     void RGBToHSV(float r, float g, float b, float& h, float& s, float& v) const;
@@ -25,6 +25,10 @@ private:
     void RenderCreateMaterialView();
 
     void RenderForBillboard(UBillboardComponent* BillboardComp);
+
+    //void RenderAddComponentCombo(AActor* SelectedActor);
+
+    void RenderAddComponentCombo(USceneComponent* SelectedComponent);
 private:
     float Width = 0, Height = 0;
     FVector Location = FVector(0, 0, 0);

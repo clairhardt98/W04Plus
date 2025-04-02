@@ -11,6 +11,7 @@
 #include "UnrealEd/ImGuiWidget.h"
 #include "UObject/Casts.h"
 #include "UObject/ObjectFactory.h"
+#include "Components/SceneComponent.h"
 
 void PropertyEditorPanel::Render()
 {
@@ -40,7 +41,7 @@ void PropertyEditorPanel::Render()
     ImGui::Begin("Detail", nullptr, PanelFlags);
     
     AEditorPlayer* player = GEngineLoop.GetWorld()->GetEditorPlayer();
-    //AActor* PickedActor = GEngineLoop.GetWorld()->GetSelectedActor();
+    AActor* PickedActor = GEngineLoop.GetWorld()->GetSelectedActor();
     USceneComponent* PickedComponent = GEngineLoop.GetWorld()->GetSelectedComponent();
 
     //USceneComponent* CurrentComponent = PickedComponent ? PickedComponent : PickedActor ? PickedActor->GetRootComponent() : nullptr;
@@ -223,6 +224,13 @@ void PropertyEditorPanel::Render()
     {
         RenderForBillboard(BillboardComponent);
     }
+
+    if (PickedComponent)
+    {
+        RenderAddComponentCombo(PickedComponent);
+    }
+
+
     ImGui::End();
 }
 
@@ -637,4 +645,78 @@ void PropertyEditorPanel::OnResize(HWND hWnd)
     GetClientRect(hWnd, &clientRect);
     Width = clientRect.right - clientRect.left;
     Height = clientRect.bottom - clientRect.top;
+}
+
+//void PropertyEditorPanel::RenderAddComponentCombo(AActor* SelectedActor)
+void PropertyEditorPanel::RenderAddComponentCombo(USceneComponent* SelectedComponent)
+{
+    if (SelectedComponent == nullptr)
+        return;
+
+    static int SelectedComponentType = 0;
+    static TArray<FString> ComponentTypes;
+    static bool bTypesInitialized = false;
+
+    if (!bTypesInitialized)
+    {
+        for (auto& kvp : UClass::GetRegistry())
+        {
+            if (kvp.Value->IsChildOf<UActorComponent>())
+                ComponentTypes.Add(kvp.Key);
+        }
+    }
+    bTypesInitialized = true;
+
+    // test
+    ImGui::Spacing();
+    if (ImGui::Button("+ Add Component"))
+    {
+        ImGui::OpenPopup("AddComponentPopup");
+    }
+    // 컴포넌트 추가 팝업
+    if (ImGui::BeginPopup("AddComponentPopup"))
+    {
+        ImGui::Text("Select Component Type");
+        ImGui::Separator();
+
+        // 컴포넌트 타입 선택 콤보박스
+        if (ImGui::BeginCombo("##ComponentTypes", *ComponentTypes[SelectedComponentType]))
+        {
+            for (int i = 0; i < ComponentTypes.Num(); i++)
+            {
+                bool bIsSelected = (SelectedComponentType == i);
+                if (ImGui::Selectable(*ComponentTypes[i], bIsSelected))
+                {
+                    SelectedComponentType = i;
+                }
+                if (bIsSelected)
+                {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+        
+
+        // 추가 버튼
+        if (ImGui::Button("Add"))
+        {
+            // 선택된 타입의 컴포넌트 생성 및 추가
+            UClass* SelectedClass = UClass::FindClass(ComponentTypes[SelectedComponentType]);
+            if (SelectedClass && SelectedClass->IsChildOf<UActorComponent>())
+            {
+                AActor* SelectedActor = SelectedComponent->GetOwner();
+                SelectedActor->AddComponentByClass(SelectedClass);
+            }
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel"))
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
 }

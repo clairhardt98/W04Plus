@@ -41,10 +41,10 @@ void OutlinerEditorPanel::Render()
         {
             bool bIsActorSelected = Actor->GetRootComponent() && Actor->GetRootComponent() == World->GetSelectedComponent();
 
-            if (bIsActorSelected)
-            {
-                RenderAddComponentCombo(Actor);
-            }
+            //if (bIsActorSelected)
+            //{
+            //    RenderAddComponentCombo(Actor);
+            //}
 
             ImGuiTreeNodeFlags NodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
 
@@ -93,74 +93,4 @@ void OutlinerEditorPanel::OnResize(HWND hWnd)
     GetClientRect(hWnd, &clientRect);
     Width = clientRect.right - clientRect.left;
     Height = clientRect.bottom - clientRect.top;
-}
-
-void OutlinerEditorPanel::RenderAddComponentCombo(AActor* SelectedActor)
-{
-    if (SelectedActor == nullptr)
-        return;
-
-    static int SelectedComponentType = 0;
-    static TArray<FString> ComponentTypes;
-    static bool bTypesInitialized = false;
-
-    if (!bTypesInitialized)
-    {
-        for (auto& kvp : UClass::GetRegistry())
-        {
-            if(kvp.Value->IsChildOf<UActorComponent>())
-                ComponentTypes.Add(kvp.Key);
-        }
-    }
-    bTypesInitialized = true;
-
-    ImGui::Spacing();
-    if (ImGui::Button("+ Add Component"))
-    {
-        ImGui::OpenPopup("AddComponentPopup");
-    }
-    // 컴포넌트 추가 팝업
-    if (ImGui::BeginPopup("AddComponentPopup"))
-    {
-        ImGui::Text("Select Component Type");
-        ImGui::Separator();
-
-        // 컴포넌트 타입 선택 콤보박스
-        if (ImGui::BeginCombo("##ComponentTypes", *ComponentTypes[SelectedComponentType]))
-        {
-            for (int i = 0; i < ComponentTypes.Num(); i++)
-            {
-                bool bIsSelected = (SelectedComponentType == i);
-                if (ImGui::Selectable(*ComponentTypes[i], bIsSelected))
-                {
-                    SelectedComponentType = i;
-                }
-                if (bIsSelected)
-                {
-                    ImGui::SetItemDefaultFocus();
-                }
-            }
-            ImGui::EndCombo();
-        }
-
-        // 추가 버튼
-        if (ImGui::Button("Add"))
-        {
-            // 선택된 타입의 컴포넌트 생성 및 추가
-            UClass* SelectedClass = UClass::FindClass(ComponentTypes[SelectedComponentType]);
-            if (SelectedClass && SelectedClass->IsChildOf<UActorComponent>())
-            {
-                SelectedActor->AddComponentByClass(SelectedClass);
-            }
-            ImGui::CloseCurrentPopup();
-        }
-
-        ImGui::SameLine();
-        if (ImGui::Button("Cancel"))
-        {
-            ImGui::CloseCurrentPopup();
-        }
-
-        ImGui::EndPopup();
-    }
 }
