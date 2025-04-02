@@ -3,6 +3,8 @@
 #include "Math/JungleMath.h"
 #include "UnrealEd/PrimitiveBatch.h"
 
+REGISTER_CLASS(ULightComponentBase, USceneComponent)
+
 ULightComponentBase::ULightComponentBase()
 {
     // FString name = "SpotLight";

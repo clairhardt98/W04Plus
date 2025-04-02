@@ -1,4 +1,4 @@
-﻿#include "ControlEditorPanel.h"
+#include "ControlEditorPanel.h"
 
 #include "World.h"
 #include "Actors/Player.h"
@@ -301,9 +301,7 @@ void ControlEditorPanel::CreateModifyButton(ImVec2 ButtonSize, ImFont* IconFont)
                     SpawnedActor = World->SpawnActor<AActor>();
                     SpawnedActor->SetActorLabel(TEXT("OBJ_Text"));
                     UText* TextComponent = SpawnedActor->AddComponent<UText>();
-                    TextComponent->SetTexture(L"Assets/Texture/font.png");
-                    TextComponent->SetRowColumnCount(106, 106);
-                    TextComponent->SetText(L"안녕하세요 Jungle 1");
+
                     break;
                 }
                 case OBJ_TRIANGLE:

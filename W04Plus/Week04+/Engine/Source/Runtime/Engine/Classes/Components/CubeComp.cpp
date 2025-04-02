@@ -10,6 +10,7 @@
 
 #include "Engine/FLoaderOBJ.h"
 
+REGISTER_CLASS(UCubeComp, UStaticMeshComponent)
 UCubeComp::UCubeComp()
 {
     SetType(StaticClass()->GetName());

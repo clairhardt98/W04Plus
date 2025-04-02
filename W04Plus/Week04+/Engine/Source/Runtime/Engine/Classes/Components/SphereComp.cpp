@@ -6,7 +6,7 @@
 #include "LevelEditor/SLevelEditor.h"
 #include "UnrealEd/PrimitiveBatch.h"
 
-
+REGISTER_CLASS(USphereComp, UStaticMeshComponent)
 USphereComp::USphereComp()
 {
     SetType(StaticClass()->GetName());

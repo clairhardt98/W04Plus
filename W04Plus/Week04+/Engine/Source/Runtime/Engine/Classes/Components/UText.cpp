@@ -6,6 +6,9 @@
 #include "LevelEditor/SLevelEditor.h"
 #include "Math/MathUtility.h"
 #include "Math/JungleMath.h"
+
+REGISTER_CLASS(UText, UBillboardComponent)
+
 UText::UText()
 {
     SetType(StaticClass()->GetName());
@@ -23,6 +26,9 @@ UText::~UText()
 void UText::InitializeComponent()
 {
     Super::InitializeComponent();
+    SetTexture(L"Assets/Texture/font.png");
+    SetRowColumnCount(106, 106);
+    SetText(L"안녕하세요 Jungle 1");
 }
 
 void UText::TickComponent(float DeltaTime)

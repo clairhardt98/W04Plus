@@ -52,6 +52,9 @@ public:
     /** Component가 현재 활성화 중인지 여부를 반환합니다. */
     bool IsActive() const { return bIsActive; }
 
+    /** Component가 현재 Tick이 활성화 중인지 여부를 반환합니다. */
+    bool bIsComponentTickEnabled() const { return bCanEverTick; }
+
     void Activate();
     void Deactivate();
 
@@ -68,7 +71,10 @@ private:
     uint8 bIsBeingDestroyed : 1;
 
     /** Component가 현재 활성화 중인지 여부 */
-    uint8 bIsActive:1;
+    uint8 bIsActive : 1;
+
+    /** Component의 Tick을 활성화할지 여부*/
+    uint8 bCanEverTick : 1;
 
 public:
     /** Component가 초기화 되었을 때, 자동으로 활성화할지 여부 */
