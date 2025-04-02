@@ -4,6 +4,7 @@
 #include "PrimitiveComponent.h"
 #include "UTexture.h"
 
+
 class UText : public UPrimitiveComponent
 {
     DECLARE_CLASS(UText, UPrimitiveComponent)

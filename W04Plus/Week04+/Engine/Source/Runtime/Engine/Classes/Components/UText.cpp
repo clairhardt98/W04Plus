@@ -167,7 +167,7 @@ FMatrix UText::CreateBillboardMatrix()
         {0,0,-1,0},
         {0,0,0,1},
         });
-    FMatrix LookAt = billboard * View;
+    FMatrix LookAt = View * billboard;
     FMatrix Scale = FMatrix::CreateScale(RelativeScale3D.x, RelativeScale3D.y, RelativeScale3D.z);
     FMatrix Trans = FMatrix::CreateTranslationMatrix(GetWorldLocation());
     return Scale * LookAt * Trans;
