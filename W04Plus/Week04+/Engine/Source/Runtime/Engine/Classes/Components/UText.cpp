@@ -1,11 +1,13 @@
+// UText.cpp
 #include "UText.h"
-
 #include "World.h"
 #include "Engine/Source/Editor/PropertyEditor/ShowFlags.h"
 #include "UnrealEd/EditorViewportClient.h"
 #include "LevelEditor/SLevelEditor.h"
+#include "Math/MathUtility.h"
+#include "Math/JungleMath.h"
 
-REGISTER_CLASS(UText, UBillboardComponent)
+REGISTER_CLASS(UText, UPrimitiveComponent)
 
 UText::UText()
 {
@@ -14,11 +16,11 @@ UText::UText()
 
 UText::~UText()
 {
-	if (vertexTextBuffer)
-	{
-		vertexTextBuffer->Release();
-		vertexTextBuffer = nullptr;
-	}
+    if (vertexTextBuffer)
+    {
+        vertexTextBuffer->Release();
+        vertexTextBuffer = nullptr;
+    }
 }
 
 void UText::InitializeComponent()
@@ -31,25 +33,16 @@ void UText::InitializeComponent()
 
 void UText::TickComponent(float DeltaTime)
 {
-	Super::TickComponent(DeltaTime);
-
-    //FVector newCamera = GetWorld()->GetCamera()->GetForwardVector();
-    //newCamera.z = 0;
-    //newCamera = newCamera.Normalize();
-    //float tmp = FVector(1.0f, 0.0f, 0.0f).Dot(newCamera);
-    //float rad = acosf(tmp);
-    //float degree = JungleMath::RadToDeg(rad);
-    //FVector vtmp = FVector(1.0f, 0.0f, 0.0f).Cross(GetWorld()->GetCamera()->GetForwardVector());
-    //if (vtmp.z < 0)
-    //	degree *= -1;
-    //RelativeRotation.z = degree + 90;
+    Super::TickComponent(DeltaTime);
 }
 
 void UText::ClearText()
 {
     vertexTextureArr.Empty();
+    quad.Empty();
 }
-void UText::SetRowColumnCount(int _cellsPerRow, int _cellsPerColumn) 
+
+void UText::SetRowColumnCount(int _cellsPerRow, int _cellsPerColumn)
 {
     RowCount = _cellsPerRow;
     ColumnCount = _cellsPerColumn;
@@ -57,95 +50,214 @@ void UText::SetRowColumnCount(int _cellsPerRow, int _cellsPerColumn)
 
 int UText::CheckRayIntersection(FVector& rayOrigin, FVector& rayDirection, float& pfNearHitDistance)
 {
-	if (!(ShowFlags::GetInstance().currentFlags & static_cast<uint64>(EEngineShowFlags::SF_BillboardText))) {
-		return 0;
-	}
-	for (int i = 0; i < vertexTextureArr.Num(); i++)
-	{
-		quad.Add(FVector(vertexTextureArr[i].x,
-			vertexTextureArr[i].y, vertexTextureArr[i].z));
-	}
-
-	return CheckPickingOnNDC(quad,pfNearHitDistance);
+    if (!(ShowFlags::GetInstance().currentFlags & static_cast<uint64>(EEngineShowFlags::SF_BillboardText))) {
+        return 0;
+    }
+    quad.Empty();
+    for (const auto& v : vertexTextureArr)
+    {
+        quad.Add(FVector(v.x, v.y, v.z));
+    }
+    return CheckPickingOnNDC(quad, pfNearHitDistance);
 }
-
 
 void UText::SetText(FWString _text)
 {
-	text = _text;
-	if (_text.empty())
-	{
-		Console::GetInstance().AddLog(LogLevel::Warning, "Text is empty");
+    text = _text;
+    vertexTextureArr.Empty();
+    quad.Empty();
 
-		vertexTextureArr.Empty();
-		quad.Empty();
+    if (_text.empty())
+    {
+        Console::GetInstance().AddLog(LogLevel::Warning, "Text is empty");
+        if (vertexTextBuffer)
+        {
+            vertexTextBuffer->Release();
+            vertexTextBuffer = nullptr;
+        }
+        return;
+    }
 
-		// 기존 버텍스 버퍼가 있다면 해제
-		if (vertexTextBuffer)
-		{
-			vertexTextBuffer->Release();
-			vertexTextBuffer = nullptr;
-		}
-		return;
-	}
-	int textSize = static_cast<int>(_text.size());
+    uint32 BitmapWidth = Texture->width;
+    uint32 BitmapHeight = Texture->height;
 
+    float CellWidth = float(BitmapWidth) / ColumnCount;
+    float CellHeight = float(BitmapHeight) / RowCount;
 
-	uint32 BitmapWidth = Texture->width;
-	uint32 BitmapHeight = Texture->height;
+    float nTexelUOffset = CellWidth / BitmapWidth;
+    float nTexelVOffset = CellHeight / BitmapHeight;
 
-	float CellWidth =  float(BitmapWidth)/ColumnCount;
-	float CellHeight = float(BitmapHeight)/RowCount;
+    for (int i = 0; i < _text.size(); i++)
+    {
+        if (_text[i] == '\0')
+        {
+            continue;
+        }
+        FVertexTexture leftUP = { 0.0f,1.0f,1.0f,0.0f,0.0f };
+        FVertexTexture rightUP = { 0.0f, -1.0f,1.0f,1.0f,0.0f };
+        FVertexTexture leftDown = { 0.0f, 1.0f,-1.0f,0.0f,1.0f };
+        FVertexTexture rightDown = { 0.0f, -1.0f,-1.0f,1.0f,1.0f };
 
-	float nTexelUOffset = CellWidth / BitmapWidth;
-	float nTexelVOffset = CellHeight/ BitmapHeight;
+        rightUP.u *= nTexelUOffset;
+        leftDown.v *= nTexelVOffset;
+        rightDown.u *= nTexelUOffset;
+        rightDown.v *= nTexelVOffset;
 
-	for (int i = 0; i < _text.size(); i++)
-	{
-		FVertexTexture leftUP = { -1.0f,1.0f,0.0f,0.0f,0.0f };
-		FVertexTexture rightUP = { 1.0f,1.0f,0.0f,1.0f,0.0f };
-		FVertexTexture leftDown = { -1.0f,-1.0f,0.0f,0.0f,1.0f };
-		FVertexTexture rightDown = { 1.0f,-1.0f,0.0f,1.0f,1.0f };
-		rightUP.u *= nTexelUOffset;
-		leftDown.v *= nTexelVOffset;
-		rightDown.u *= nTexelUOffset;
-		rightDown.v *= nTexelVOffset;
+        leftUP.y -= quadWidth * i;
+        rightUP.y -= quadWidth * i;
+        leftDown.y -= quadWidth * i;
+        rightDown.y -= quadWidth * i;
 
-		leftUP.x += quadWidth * i;
-		rightUP.x += quadWidth * i;
-		leftDown.x += quadWidth * i;
-		rightDown.x += quadWidth * i;
+        float startU = 0.0f;
+        float startV = 0.0f;
+        setStartUV(_text[i], startU, startV);
 
-		float startU = 0.0f;
-		float startV = 0.0f;
+        leftUP.u += (nTexelUOffset * startU);
+        leftUP.v += (nTexelVOffset * startV);
+        rightUP.u += (nTexelUOffset * startU);
+        rightUP.v += (nTexelVOffset * startV);
+        leftDown.u += (nTexelUOffset * startU);
+        leftDown.v += (nTexelVOffset * startV);
+        rightDown.u += (nTexelUOffset * startU);
+        rightDown.v += (nTexelVOffset * startV);
 
-		setStartUV(_text[i], startU, startV);
-		leftUP.u += (nTexelUOffset * startU);
-		leftUP.v += (nTexelVOffset * startV);
-		rightUP.u += (nTexelUOffset * startU);
-		rightUP.v += (nTexelVOffset * startV);
-		leftDown.u += (nTexelUOffset * startU);
-		leftDown.v += (nTexelVOffset * startV);
-		rightDown.u += (nTexelUOffset * startU);
-		rightDown.v += (nTexelVOffset * startV);
+        vertexTextureArr.Add(leftUP);
+        vertexTextureArr.Add(rightUP);
+        vertexTextureArr.Add(leftDown);
+        vertexTextureArr.Add(rightUP);
+        vertexTextureArr.Add(rightDown);
+        vertexTextureArr.Add(leftDown);
+    }
 
-		vertexTextureArr.Add(leftUP);
-		vertexTextureArr.Add(rightUP);
-		vertexTextureArr.Add(leftDown);
-		vertexTextureArr.Add(rightUP);
-		vertexTextureArr.Add(rightDown);
-		vertexTextureArr.Add(leftDown);
-	}
-	UINT byteWidth = static_cast<UINT>(vertexTextureArr.Num() * sizeof(FVertexTexture));
+    float lastX = -1.0f + quadSize * _text.size();
+    quad.Add(FVector(-1.0f, 1.0f, 0.0f));
+    quad.Add(FVector(-1.0f, -1.0f, 0.0f));
+    quad.Add(FVector(lastX, 1.0f, 0.0f));
+    quad.Add(FVector(lastX, -1.0f, 0.0f));
 
-	float lastX = -1.0f + quadSize* _text.size();
-	quad.Add(FVector(-1.0f,1.0f,0.0f));
-	quad.Add(FVector(-1.0f,-1.0f,0.0f));
-	quad.Add(FVector(lastX,1.0f,0.0f));
-	quad.Add(FVector(lastX,-1.0f,0.0f));
-
-	CreateTextTextureVertexBuffer(vertexTextureArr,byteWidth);
+    UINT byteWidth = static_cast<UINT>(vertexTextureArr.Num() * sizeof(FVertexTexture));
+    CreateTextTextureVertexBuffer(vertexTextureArr, byteWidth);
 }
+
+void UText::TextMVPRendering()
+{
+    FEngineLoop::renderer.PrepareTextureShader();
+
+    FMatrix Model = bBillboardMode ? CreateBillboardMatrix() : CreateStandardModelMatrix();
+    FMatrix View = GetEngine().GetLevelEditor()->GetActiveViewportClient()->GetViewMatrix();
+    FMatrix Proj = GetEngine().GetLevelEditor()->GetActiveViewportClient()->GetProjectionMatrix();
+
+    FMatrix MVP = Model * View * Proj;
+    FMatrix NormalMatrix = FMatrix::Transpose(FMatrix::Inverse(Model));
+
+    FVector4 UUIDColor = EncodeUUID() / 255.0f;
+    bool bSelected = (GetWorld()->GetSelectedActor() == GetOwner());
+
+    FEngineLoop::renderer.UpdateConstant(MVP, NormalMatrix, UUIDColor, bSelected);
+    FEngineLoop::renderer.RenderTextPrimitive(vertexTextBuffer, numTextVertices, Texture->TextureSRV, Texture->SamplerState);
+}
+
+FMatrix UText::CreateBillboardMatrix()
+{
+    // 1. 카메라의 View 행렬 가져오기
+    FMatrix View = GetEngine().GetLevelEditor()->GetActiveViewportClient()->GetViewMatrix();
+
+    // 2. 회전 부분만 추출 (이동 성분 제거)
+    View.M[3][0] = View.M[3][1] = View.M[3][2] = 0.0f;  // 이동 제거
+    View.M[0][3] = View.M[1][3] = View.M[2][3] = 0.0f;  // 투영 관련 성분 제거
+
+    // 3. View 행렬의 회전 부분만 역행렬 계산 (카메라 방향에 맞춤)
+    FMatrix ViewRotation = View;
+    ViewRotation.M[3][3] = 1.0f;  // 동차 좌표 보정
+    FMatrix InverseViewRotation = FMatrix::Inverse(ViewRotation);  // 회전만 역변환
+
+    // 4. 빌보드의 기본 방향 설정 (X: Right, Y: Up, Z: Forward)
+    FMatrix BillboardBase({
+    {0,0,1,0},
+    {-1,0,0,0},
+    {0,1,0,0},
+    {0,0,0,1},
+        });
+
+    // 5. 최종 빌보드 회전 = BillboardBase * InverseViewRotation
+    FMatrix BillboardRotation = BillboardBase * InverseViewRotation;
+
+    // 6. 스케일 및 위치 적용
+    FMatrix Scale = FMatrix::CreateScale(RelativeScale3D.x, RelativeScale3D.y, RelativeScale3D.z);
+    FMatrix Translation = FMatrix::CreateTranslationMatrix(GetWorldLocation());
+
+    // 7. 최종 행렬: Scale -> Rotate -> Translate
+    return Scale * BillboardRotation * Translation;
+}
+
+FMatrix UText::CreateStandardModelMatrix()
+{
+    return JungleMath::CreateModelMatrix(GetWorldLocation(), GetWorldRotation(), GetWorldScale());
+}
+
+void UText::SetTexture(FWString _fileName)
+{
+    Texture = FEngineLoop::resourceMgr.GetTexture(_fileName);
+}
+
+void UText::SetBillboardMode(bool bEnable)
+{
+    bBillboardMode = bEnable;
+}
+
+bool UText::CheckPickingOnNDC(const TArray<FVector>& checkQuad, float& hitDistance)
+{
+    bool result = false;
+    POINT mousePos;
+    GetCursorPos(&mousePos);
+    ScreenToClient(GEngineLoop.hWnd, &mousePos);
+
+    D3D11_VIEWPORT viewport;
+    UINT numViewports = 1;
+    FEngineLoop::graphicDevice.DeviceContext->RSGetViewports(&numViewports, &viewport);
+
+    FVector pickPosition;
+    pickPosition.x = ((2.0f * mousePos.x / viewport.Width) - 1);
+    pickPosition.y = -((2.0f * mousePos.y / viewport.Height) - 1);
+    pickPosition.z = 1.0f;
+
+    FMatrix M = bBillboardMode ? CreateBillboardMatrix() : CreateStandardModelMatrix();
+    FMatrix V = GEngineLoop.GetLevelEditor()->GetActiveViewportClient()->GetViewMatrix();
+    FMatrix P = GEngineLoop.GetLevelEditor()->GetActiveViewportClient()->GetProjectionMatrix();
+    FMatrix MVP = M * V * P;
+
+    float minX = FLT_MAX, maxX = -FLT_MAX;
+    float minY = FLT_MAX, maxY = -FLT_MAX;
+    float avgZ = 0.0f;
+
+    for (const FVector& p : checkQuad)
+    {
+        FVector4 v = FVector4(p.x, p.y, p.z, 1.0f);
+        FVector4 clip = FMatrix::TransformVector(v, MVP);
+        if (clip.a != 0) clip = clip / clip.a;
+
+        minX = FMath::Min(minX, clip.x);
+        maxX = FMath::Max(maxX, clip.x);
+        minY = FMath::Min(minY, clip.y);
+        maxY = FMath::Max(maxY, clip.y);
+        avgZ += clip.z;
+    }
+
+    avgZ /= checkQuad.Num();
+
+    if (pickPosition.x >= minX && pickPosition.x <= maxX && pickPosition.y >= minY && pickPosition.y <= maxY)
+    {
+        FMatrix& P = GEngineLoop.GetLevelEditor()->GetActiveViewportClient()->GetProjectionMatrix();
+        float A = P.M[2][2];
+        float B = P.M[3][2];
+        float z_view_pick = (pickPosition.z - B) / A;
+        float z_view_text = (avgZ - B) / A;
+        hitDistance = 1000.0f;
+        result = true;
+    }
+    return result;
+}
+
 void UText::setStartUV(wchar_t hangul, float& outStartU, float& outStartV)
 {
     //대문자만 받는중
@@ -180,6 +292,13 @@ void UText::setStartUV(wchar_t hangul, float& outStartU, float& outStartV)
         StartU = 63;
         StartV = 0;
         offset = hangul - L'가'; // 대문자 위치
+    }
+   else
+    {
+        outStartU = 0; 
+        outStartV = 0;
+        offset = 0;
+        return;
     }
 
     if (offset == -1)
@@ -259,30 +378,4 @@ void UText::CreateTextTextureVertexBuffer(const TArray<FVertexTexture>& _vertex,
 	//FEngineLoop::resourceMgr.RegisterMesh(&FEngineLoop::renderer, "JungleText", _vertex, _vertex.Num() * sizeof(FVertexTexture),
 	//	nullptr, 0);
 
-}
-
-
-void UText::TextMVPRendering()
-{
-    FEngineLoop::renderer.PrepareTextureShader();
-    //FEngineLoop::renderer.UpdateSubUVConstant(0, 0);
-    //FEngineLoop::renderer.PrepareSubUVConstant();
-    FMatrix Model = CreateBillboardMatrix();
-
-    FMatrix MVP = Model * GetEngine().GetLevelEditor()->GetActiveViewportClient()->GetViewMatrix() * GetEngine().GetLevelEditor()->GetActiveViewportClient()->GetProjectionMatrix();
-    FMatrix NormalMatrix = FMatrix::Transpose(FMatrix::Inverse(Model));
-    FVector4 UUIDColor = EncodeUUID() / 255.0f;
-    if (this == GetWorld()->GetPickingGizmo()) {
-        FEngineLoop::renderer.UpdateConstant(MVP, NormalMatrix, UUIDColor, true);
-    }
-    else
-        FEngineLoop::renderer.UpdateConstant(MVP, NormalMatrix, UUIDColor, false);
-
-    if (ShowFlags::GetInstance().currentFlags & static_cast<uint64>(EEngineShowFlags::SF_BillboardText)) {
-        FEngineLoop::renderer.RenderTextPrimitive(vertexTextBuffer, numTextVertices,
-            Texture->TextureSRV, Texture->SamplerState);
-    }
-    //Super::Render();
-
-    FEngineLoop::renderer.PrepareShader();
 }
