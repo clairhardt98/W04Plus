@@ -73,6 +73,7 @@ private:
     /** Component가 현재 활성화 중인지 여부 */
     uint8 bIsActive : 1;
 
+protected:
     /** Component의 Tick을 활성화할지 여부*/
     uint8 bCanEverTick : 1;
 
