@@ -40,8 +40,8 @@ UObject* UObject::DuplicateObject(const FObjectDuplicationParameters& Params) co
     FName NewName = (Params.NewName != NAME_None) ? Params.NewName : this->NamePrivate;
 
     // test error
-    //UObject* NewObject = FObjectFactory::ConstructObject<UObject>();
-    UObject* NewObject = FObjectFactory::ConstructObjectFromClass<UObject>(GetClass(), Outer, NewName);
+    UObject* NewObject = FObjectFactory::ConstructObject<UObject>();
+    //UObject* NewObject = FObjectFactory::ConstructObjectFromClass<UObject>(GetClass(), Outer, NewName);
     // DuplicationMap이 있다면 현재 객체와 새 객체를 등록하여 순환 참조 방지
     if (Params.DuplicationMap)
     {

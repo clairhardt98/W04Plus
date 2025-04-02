@@ -487,7 +487,7 @@ void ControlEditorPanel::CreatePIEButton(ImVec2 ButtonSize, ImFont* IconFont)
     {
         ImGui::PushStyleColor(ImGuiCol_Button, ActiveColor);
     }
-    if (ImGui::Button("\e923 ", ButtonSize))// Play
+    if (ImGui::Button("\ue9a8", ButtonSize))// Play
     {
         GEngineLoop.StartPlayInEditor();
     }
