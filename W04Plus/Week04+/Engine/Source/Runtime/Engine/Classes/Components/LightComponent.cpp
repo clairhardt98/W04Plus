@@ -23,8 +23,7 @@ void ULightComponentBase::InitializeComponent()
 void ULightComponentBase::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
     Super::EndPlay(EndPlayReason);
-    GetOwner()->RemoveOwnedComponent(texture2D);
-    texture2D = nullptr;
+
 }
 void ULightComponentBase::SetColor(FVector4 newColor)
 {
@@ -60,7 +59,7 @@ UObject* ULightComponentBase::Duplicate(UObject* Outer, UClass* ClassInfo)
 
 void ULightComponentBase::InitializeLight()
 {
-    texture2D = GetOwner()->AddComponent<UBillboardComponent>();
+    UBillboardComponent* texture2D = GetOwner()->AddComponent<UBillboardComponent>();
     texture2D->SetTexture(L"Assets/Texture/spotLight.png");
     //texture2D->InitializeComponent();
     AABB.max = { 1.f,1.f,0.1f };
@@ -73,8 +72,7 @@ void ULightComponentBase::TickComponent(float DeltaTime)
 {
     Super::TickComponent(DeltaTime);
 
-    texture2D->TickComponent(DeltaTime);
-    texture2D->SetLocation(GetWorldLocation());
+   
 
 }
 
