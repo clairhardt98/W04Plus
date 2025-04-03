@@ -52,7 +52,7 @@ UObject* ULightComponentBase::Duplicate(UObject* Outer, UClass* ClassInfo)
     NewComponent->radius = radius;
     NewComponent->AABB = AABB;
     // test
-    NewComponent->texture2D = texture2D;
+    
 
     return NewComponent;
 }
